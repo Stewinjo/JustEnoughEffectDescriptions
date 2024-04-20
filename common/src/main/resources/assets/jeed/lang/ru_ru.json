@@ -159,8 +159,8 @@
   "effect.habitat.prickling,description": "Has a chance to deal thorns damage equal to its level to the attacker.",
   "effect.habitat.prolongation.description": "Increases the duration of all incoming potion effects by 20%.",
   
-	"effect.hordes.infected.description": "Убивает игрока, превращая его в зомби по истечении времени действия.",
-	"effect.hordes.immunity.description": "Даёт защиту от зомби-инфекции.",
+  "effect.hordes.infected.description": "Убивает игрока, превращая его в зомби по истечении четырёх стадий заражения.",
+  "effect.hordes.immunity.description": "Даёт защиту от зомби-инфекции.",
 
   "effect.immersiveengineering.concrete_feet.description": "Makes the target unable to move or jump. The effect immediately ends when the user is no longer standing on Concrete",
   "effect.immersiveengineering.conductive.description": "Affected entities take extra damage from electric or 'flux' damage, such as Redstone Arsenal weapons or electrified Razor Wire",
@@ -204,11 +204,11 @@
   "effect.seasonals.puppeteering.description": "Allows the player pick up and move mobs with lower health.",
   "effect.seasonals.thorn_resistance.description": "Lowers damage taken from spiky plants and thorns damage.",
 
-  "effect.sculk_horde.sculk_infected.description": "Скалковое заражение клещом в теле носителя. Приводит к распространению скалковой орды на близлежащие блоки.",
-  "effect.sculk_horde.sculk_lure.description": "Позволяет скалковому мозгу отслеживать вас с большого расстояния. Можно снять, используя колбу для очистки.",
-  "effect.sculk_horde.purity.description": "Жизненно важный эффект, не позволяющий сущностям получать эффекты зарытый и приманка. Его можно получить, бросив в себя колбу для очистки.",
-  "effect.sculk_horde.diseased_cysts.description": "Наносит урон и заражает других существ, находящихся рядом с изначальной жертвой. Можно снять, используя колбу для очистки.",
-  "effect.sculk_horde.sculk_vessel.description": "В разработке",
+  "effect.sculkhorde.sculk_infected.description": "Скалковое заражение клещом в теле носителя. Приводит к распространению скалковой орды на близлежащие блоки.",
+  "effect.sculkhorde.sculk_lure.description": "Позволяет скалковому мозгу отслеживать вас с большого расстояния. Можно снять, используя колбу для очистки.",
+  "effect.sculkhorde.purity.description": "Жизненно важный эффект, не позволяющий сущностям получать эффекты зарытый и приманка. Его можно получить, бросив в себя колбу для очистки.",
+  "effect.sculkhorde.diseased_cysts.description": "Наносит урон и заражает других существ, находящихся рядом с изначальной жертвой. Можно снять, используя колбу для очистки.",
+  "effect.sculkhorde.sculk_vessel.description": "В разработке",
 
   "effect.tetra.bleeding.description": "Inflicts damage over time.",
   "effect.tetra.earthbound.description": "The affected entity is slowed, take less knockback and cannot jump.",
