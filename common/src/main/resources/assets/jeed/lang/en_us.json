@@ -117,8 +117,8 @@
 
   "effect.fantasy.glowing_vision.description": "Causes Unicorns in a radius of 500 blocks to obtain the glowing effect, making them easier to locate.",
 
-  "effect.farmersdelight.comfort.description": "Removes and grants immunity to Slowness, Hunger and Weakness.",
-  "effect.farmersdelight.nourishment.description": "Prevents players from losing hunger or saturation from any other source other than replenishing health points.",
+  "effect.farmersdelight.comfort.description": "Provides natural regeneration, regardless of how hungry you are.",
+  "effect.farmersdelight.nourishment.description": "Prevents hunger loss, except when using saturation to heal damage.",
 
   "effect.farmersrespite.caffeinated.description": "Increases the target's walk and attack speed.",
 
