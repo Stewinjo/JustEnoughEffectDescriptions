@@ -6,7 +6,6 @@ import net.mehvahdjukaar.jeed.Jeed;
 import net.mehvahdjukaar.jeed.recipes.EffectProviderRecipe;
 import net.mehvahdjukaar.jeed.recipes.PotionProviderRecipe;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
@@ -20,43 +19,29 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SuspiciousStewItem;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.FlowerBlock;
 import net.minecraft.world.level.block.entity.BeaconBlockEntity;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Supplier;
 
-public abstract class EffectInfo {
+import static net.mehvahdjukaar.jeed.common.Constants.ROWS;
+import static net.mehvahdjukaar.jeed.common.Constants.SLOTS_PER_ROW;
 
-    private static final Supplier<Map<MobEffect, List<ItemStack>>> STATIC_CACHE = Suppliers.memoize(EffectInfo::buildStaticCache);
+public abstract class EffectWindowEntry {
+
+    private static final Supplier<Map<MobEffect, List<ItemStack>>> STATIC_CACHE = Suppliers.memoize(EffectWindowEntry::buildStaticCache);
 
     protected final List<FormattedText> description;
     protected final MobEffectInstance effect;
-    protected final List<ItemStack> inputItems;
 
-    protected EffectInfo(MobEffectInstance effectInstance, List<ItemStack> input, List<FormattedText> description) {
+    protected EffectWindowEntry(MobEffectInstance effectInstance, List<FormattedText> description) {
         this.description = description;
         this.effect = effectInstance;
-        this.inputItems = input;
-    }
-
-    public static final Comparator<ItemStack> COMPARATOR = (o1, o2) -> {
-        var r1 = BuiltInRegistries.ITEM.getKey(o1.getItem());
-        var r2 = BuiltInRegistries.ITEM.getKey(o2.getItem());
-        int i = r1.getNamespace().compareTo(r2.getNamespace());
-        if (i == 0) {
-            i = r1.getPath().compareTo(r1.getPath());
-            if(i == 0){
-                return o1.getDisplayName().getString().compareTo(o2.getDisplayName().getString());
-            }
-        }
-        return i;
-    };
-
-    public List<ItemStack> getInputItems() {
-        return inputItems;
     }
 
     public List<FormattedText> getDescription() {
@@ -66,6 +51,7 @@ public abstract class EffectInfo {
     public MobEffectInstance getEffect() {
         return effect;
     }
+
 
     private static Map<MobEffect, List<ItemStack>> buildStaticCache() {
         Map<MobEffect, List<ItemStack>> effectProvidingItems = new HashMap<>();
@@ -107,7 +93,7 @@ public abstract class EffectInfo {
         return effectProvidingItems;
     }
 
-    public static List<ItemStack> computeEffectProviders(MobEffect effect) {
+    public static List<Ingredient> computeEffectProviders(MobEffect effect) {
 
         ItemStackList list = new ItemStackList();
 
@@ -154,10 +140,68 @@ public abstract class EffectInfo {
         var stat = STATIC_CACHE.get().get(effect);
         if (stat != null) list.addAll(stat);
 
-        list.sort(COMPARATOR);
+        return groupIngredients(list);
+    }
+
+
+    private static List<Ingredient> groupIngredients(List<ItemStack> ingredients) {
+        Map<Item, Ingredient> map = new HashMap<>();
+        for (ItemStack stack : ingredients) {
+            map.merge(stack.getItem(), Ingredient.of(stack), EffectWindowEntry::mergeIngredients);
+        }
+        var entryList = sortIngredients(map);
+
+        // Create a new LinkedHashMap and insert sorted entries
+        List<Ingredient> list = new ArrayList<>();
+        for (var entry : entryList) {
+            list.add(entry.getValue());
+        }
         return list;
     }
 
+    private static Ingredient mergeIngredients(Ingredient i1, Ingredient i2) {
+        List<ItemStack> l = new ArrayList<>();
+        l.addAll(Arrays.stream(i1.getItems()).toList());
+        l.addAll(Arrays.stream(i2.getItems()).toList());
+        return Ingredient.of(l.toArray(new ItemStack[0]));
+    }
+
+    private static @NotNull ArrayList<Map.Entry<Item, Ingredient>> sortIngredients(Map<Item, Ingredient> map) {
+        var entryList = new ArrayList<>(map.entrySet());
+        entryList.sort((entry1, entry2) -> {
+            ResourceLocation first = BuiltInRegistries.ITEM.getKey(entry1.getKey());
+            ResourceLocation second = BuiltInRegistries.ITEM.getKey(entry2.getKey());
+            String secondNamespace = second.getNamespace();
+            String firstNamespace = first.getNamespace();
+            String mc = "minecraft";
+            if (mc.equals(firstNamespace) && !mc.equals(secondNamespace)) {
+                return -1;
+            } else if (!mc.equals(firstNamespace) && mc.equals(secondNamespace)) {
+                return 1;
+            } else {
+                int pathComparison = firstNamespace.compareTo(secondNamespace);
+                if (pathComparison != 0) {
+                    return pathComparison;
+                } else {
+                    return second.getPath().compareTo(second.getPath());
+                }
+            }
+        });
+        return entryList;
+    }
+
+    public static <T> List<List<T>> divideIntoSlots(List<T> ingredients) {
+
+        List<List<T>> slotContents = new ArrayList<>();
+
+        for (int slotId = 0; slotId < ingredients.size(); slotId++) {
+
+            int ind = slotId % (SLOTS_PER_ROW * ROWS);
+            if (slotContents.size() <= ind) slotContents.add(new ArrayList<>());
+            slotContents.get(ind).add(ingredients.get(slotId));
+        }
+        return slotContents;
+    }
 
     private static class ItemStackList extends ArrayList<ItemStack> {
 
@@ -187,11 +231,11 @@ public abstract class EffectInfo {
         return text;
     }
 
-    public static int getListHeight(List<ItemStack> inputs) {
+    public static int getListHeight(List<?> inputs) {
         int listH = 0;
         if (Jeed.hasIngredientList() && !inputs.isEmpty()) {
-            listH = EffectCategory.MAX_BOX_HEIGHT;
-            if (inputs.size() <= EffectCategory.SLOTS_PER_ROW) {
+            listH = Constants.MAX_BOX_HEIGHT;
+            if (inputs.size() <= SLOTS_PER_ROW) {
                 listH /= 2;
             }
         }

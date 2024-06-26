@@ -8,11 +8,13 @@ import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.client.registry.display.DisplayCategory;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
+import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.entry.EntryStack;
+import me.shedaniel.rei.api.common.util.EntryIngredients;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.mehvahdjukaar.jeed.Jeed;
-import net.mehvahdjukaar.jeed.common.EffectCategory;
-import net.mehvahdjukaar.jeed.common.EffectInfo;
+import net.mehvahdjukaar.jeed.common.Constants;
+import net.mehvahdjukaar.jeed.common.EffectWindowEntry;
 import net.mehvahdjukaar.jeed.common.HSLColor;
 import net.mehvahdjukaar.jeed.plugin.rei.REIPlugin;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
@@ -22,11 +24,14 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class EffectInfoDisplayCategory extends EffectCategory implements DisplayCategory<EffectInfoDisplay> {
+import static net.mehvahdjukaar.jeed.common.Constants.*;
+
+public class EffectInfoDisplayCategory implements DisplayCategory<EffectInfoDisplay> {
 
     public static final int SIZE_DIFF = 3;
 
@@ -53,7 +58,7 @@ public class EffectInfoDisplayCategory extends EffectCategory implements Display
 
     @Override
     public Component getTitle() {
-        return localizedName;
+        return LOCALIZED_NAME;
     }
 
     @Override
@@ -89,39 +94,29 @@ public class EffectInfoDisplayCategory extends EffectCategory implements Display
                 .disableBackground()
                 .markInput().entry(display.getOutputEntries().get(0).get(0)));
 
-        List<ItemStack> inputItems = display.getInputItems();
-        int listH = EffectInfo.getListHeight(inputItems);
+        var slotContents = display.getOutputEntries();
+        int listH = EffectWindowEntry.getListHeight(slotContents);
 
         widgets.add(new ScrollableTextWidget(new Rectangle(bounds.x + SIZE_DIFF,
                 rect2.getMaxY() + 1, bounds.width - 2 * SIZE_DIFF,
-                50 + EffectCategory.MAX_BOX_HEIGHT - listH), display.getComponents()));
+                50 + Constants.MAX_BOX_HEIGHT - listH), display.getComponents()));
 
         if (listH != 0) {
 
-
-            List<List<EntryStack<?>>> slotContents = new ArrayList<>();
-
-            for (int slotId = 0; slotId < inputItems.size(); slotId++) {
-
-                int ind = slotId % (SLOTS_PER_ROW * ROWS);
-                if (slotContents.size() <= ind) slotContents.add(new ArrayList<>());
-                slotContents.get(ind).add(EntryStacks.of((inputItems.get(slotId))));
-            }
-
-            int r = slotContents.size() <= SLOTS_PER_ROW ? 1 : ROWS;
+            int rowsCount = slotContents.size() <= SLOTS_PER_ROW ? 1 : ROWS;
 
             boolean renderSlots = Jeed.rendersSlots();
             if (!renderSlots) {
                 widgets.add(Widgets.createSlotBase(new Rectangle(bounds.x + (int) (bounds.width / 2f - (SLOT_W * SLOTS_PER_ROW) / 2f),
-                        bounds.getMaxY() - SLOT_W * r - 7, SLOTS_PER_ROW * SLOT_W + 1, r * SLOT_W + 1)));
+                        bounds.getMaxY() - SLOT_W * rowsCount - 7, SLOTS_PER_ROW * SLOT_W + 1, rowsCount * SLOT_W + 1)));
             }
 
-            int size = renderSlots ? SLOTS_PER_ROW * (slotContents.size() < SLOTS_PER_ROW ? 1 : ROWS) : slotContents.size();
+            int size = renderSlots ? SLOTS_PER_ROW * (slotContents.size() <= SLOTS_PER_ROW ? 1 : ROWS) : slotContents.size();
 
             for (int slotId = 0; slotId < size; slotId++) {
                 Slot slot = Widgets.createSlot(new Point(
                         2 + bounds.x + (int) (bounds.width / 2f - (SLOT_W * SLOTS_PER_ROW) / 2f + (SLOT_W * (slotId % SLOTS_PER_ROW))),
-                        2 + bounds.getMaxY() - SLOT_W * r + SLOT_W * (slotId / SLOTS_PER_ROW) - 7));
+                        2 + bounds.getMaxY() - SLOT_W * rowsCount + SLOT_W * (slotId / SLOTS_PER_ROW) - 7));
 
                 if (!renderSlots) slot.disableBackground();
                 if (slotId < slotContents.size()) {

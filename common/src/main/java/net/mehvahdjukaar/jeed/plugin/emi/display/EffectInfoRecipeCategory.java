@@ -1,40 +1,12 @@
 package net.mehvahdjukaar.jeed.plugin.emi.display;
 
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
-import dev.emi.emi.api.render.EmiTexture;
-import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
-import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
-import mezz.jei.api.gui.drawable.IDrawable;
-import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
-import mezz.jei.api.helpers.IGuiHelper;
-import mezz.jei.api.ingredients.IIngredientType;
-import mezz.jei.api.recipe.IFocusGroup;
-import mezz.jei.api.recipe.RecipeIngredientRole;
-import mezz.jei.api.recipe.RecipeType;
-import net.mehvahdjukaar.jeed.Jeed;
-import net.mehvahdjukaar.jeed.common.EffectCategory;
-import net.mehvahdjukaar.jeed.common.HSLColor;
-import net.mehvahdjukaar.jeed.plugin.jei.JEIPlugin;
-import net.mehvahdjukaar.jeed.plugin.jei.display.EffectBox;
-import net.mehvahdjukaar.jeed.plugin.jei.display.EffectInfoRecipe;
-import net.mehvahdjukaar.jeed.plugin.jei.ingredient.EffectInstanceRenderer;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.tabs.Tab;
-import net.minecraft.locale.Language;
-import net.minecraft.network.chat.*;
+import net.mehvahdjukaar.jeed.common.Constants;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.item.ItemStack;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class EffectInfoRecipeCategory extends EmiRecipeCategory {
-    private final EffectCategory inner = new EffectCategory() {
-    };
+
 
 
     public EffectInfoRecipeCategory(ResourceLocation id) {
@@ -45,8 +17,13 @@ public class EffectInfoRecipeCategory extends EmiRecipeCategory {
         //this.slotBackground = guiHelper.getSlotDrawable();
     }
 
+    @Override
+    public Component getName() {
+        return Constants.LOCALIZED_NAME;
+    }
 
-/*
+
+    /*
 
     @Override
     public RecipeType<EffectInfoRecipe> getRecipeType() {

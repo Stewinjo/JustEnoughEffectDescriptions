@@ -11,7 +11,6 @@ import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.mehvahdjukaar.jeed.Jeed;
-import net.mehvahdjukaar.jeed.common.EffectCategory;
 import net.mehvahdjukaar.jeed.common.HSLColor;
 import net.mehvahdjukaar.jeed.plugin.jei.JEIPlugin;
 import net.mehvahdjukaar.jeed.plugin.jei.ingredient.EffectInstanceRenderer;
@@ -22,12 +21,13 @@ import net.minecraft.locale.Language;
 import net.minecraft.network.chat.*;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class EffectInfoRecipeCategory extends EffectCategory implements IRecipeCategory<EffectInfoRecipe> {
+import static net.mehvahdjukaar.jeed.common.Constants.*;
+
+public class EffectInfoRecipeCategory implements IRecipeCategory<EffectInfoRecipe> {
 
     private final IDrawable background;
     private final IDrawable icon;
@@ -49,7 +49,7 @@ public class EffectInfoRecipeCategory extends EffectCategory implements IRecipeC
 
     @Override
     public Component getTitle() {
-        return this.localizedName;
+        return LOCALIZED_NAME;
     }
 
     @Override
@@ -85,7 +85,7 @@ public class EffectInfoRecipeCategory extends EffectCategory implements IRecipeC
         }
 
         if (Jeed.hasIngredientList()) {
-            int size = recipe.getInputItems().size();
+            int size = recipe.ingredients.size();
             if (size != 0) {
                 int maxSlots = size <= SLOTS_PER_ROW ? SLOTS_PER_ROW : SLOTS_PER_ROW * ROWS;
                 for (int slotId = 0; slotId < maxSlots; slotId++) {
@@ -115,27 +115,17 @@ public class EffectInfoRecipeCategory extends EffectCategory implements IRecipeC
         }
 
         if (Jeed.hasIngredientList()) {
-            List<ItemStack> inputItems = recipe.getInputItems();
 
-            List<List<ItemStack>> slotContents = new ArrayList<>();
+            List<Ingredient> slotContents = recipe.ingredients;
 
-            for (int slotId = 0; slotId < inputItems.size(); slotId++) {
-
-                int ind = slotId % (SLOTS_PER_ROW * ROWS);
-                if (slotContents.size() <= ind) slotContents.add(new ArrayList<>());
-                slotContents.get(ind).add(inputItems.get(slotId));
-            }
-
-            int r = inputItems.size() <= SLOTS_PER_ROW ? 1 : ROWS;
-
+            int rowsCount = slotContents.size() <= SLOTS_PER_ROW ? 1 : ROWS;
 
             for (int slotId = 0; slotId < slotContents.size(); slotId++) {
-                int off = Jeed.EMI ? 1 : 0;
-                int x = off + (int) (RECIPE_WIDTH / 2 + (float) ROWS + (SLOT_W * ((slotId % SLOTS_PER_ROW) - SLOTS_PER_ROW / 2f)));
+                int x = (int) ((float) RECIPE_WIDTH / 2 + (float) ROWS + (SLOT_W * ((slotId % SLOTS_PER_ROW) - SLOTS_PER_ROW / 2f)));
 
-                int y = 1 + RECIPE_HEIGHT - SLOT_W * (r - (slotId / SLOTS_PER_ROW));
+                int y = 1 + RECIPE_HEIGHT - SLOT_W * (rowsCount - (slotId / SLOTS_PER_ROW));
                 builder.addSlot(RecipeIngredientRole.INPUT, x, y)
-                        .addItemStacks(slotContents.get(slotId));
+                        .addIngredients(slotContents.get(slotId));
             }
         }
     }

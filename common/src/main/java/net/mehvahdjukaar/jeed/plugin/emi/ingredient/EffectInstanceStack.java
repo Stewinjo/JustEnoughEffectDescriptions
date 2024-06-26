@@ -29,7 +29,7 @@ public class EffectInstanceStack extends EmiStack {
 
     @Override
     public void render(GuiGraphics draw, int x, int y, float delta, int flags) {
-        RENDERER.render(draw, effect, x, y, 16, 16);
+        RENDERER.render(draw, effect, x - 1, y - 1, 16, 16);
     }
 
     @Override

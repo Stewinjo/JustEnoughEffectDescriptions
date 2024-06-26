@@ -4,8 +4,8 @@ import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.runtime.IIngredientVisibility;
 import net.mehvahdjukaar.jeed.Jeed;
-import net.mehvahdjukaar.jeed.common.EffectCategory;
-import net.mehvahdjukaar.jeed.common.EffectInfo;
+import net.mehvahdjukaar.jeed.common.Constants;
+import net.mehvahdjukaar.jeed.common.EffectWindowEntry;
 import net.mehvahdjukaar.jeed.plugin.jei.JEIPlugin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -15,33 +15,39 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class EffectInfoRecipe extends EffectInfo {
+public class EffectInfoRecipe extends EffectWindowEntry {
 
     public static final RecipeType<EffectInfoRecipe> TYPE = RecipeType.create(Jeed.MOD_ID, "effect_info", EffectInfoRecipe.class);
+    protected final List<Ingredient> ingredients;
 
-    protected EffectInfoRecipe(MobEffectInstance effectInstance, List<ItemStack> input, List<FormattedText> description) {
-        super(effectInstance, input, description);
+    protected EffectInfoRecipe(MobEffectInstance effectInstance, List<Ingredient> ingredients, List<FormattedText> description) {
+        super(effectInstance, description);
+        this.ingredients = ingredients;
     }
 
+    //TODO: re add
+    /*
     @Override
-    public List<ItemStack> getInputItems() {
+    public List<Ingredient> getIngredientsList() {
         IIngredientVisibility ingredientVisibility = JEIPlugin.JEI_INGREDIENT_VISIBILITY;
-        return inputItems.stream()
+
+        return ingredientsList.stream()
                 .filter(s -> !s.isEmpty())
-                .filter(s -> ingredientVisibility.isIngredientVisible(VanillaTypes.ITEM_STACK, s))
+                .filter(s -> ingredientVisibility.isIngredientVisible(VanillaTypes.ITEM_STACK))
                 .toList();
-    }
+    }*/
 
     public static List<EffectInfoRecipe> create(MobEffect effect) {
         Minecraft minecraft = Minecraft.getInstance();
         Component text = getDescription(effect);
-        List<ItemStack> inputs = computeEffectProviders(effect);
+        List<Ingredient> inputs = computeEffectProviders(effect);
 
         int listH = getListHeight(inputs);
 
@@ -51,7 +57,7 @@ public class EffectInfoRecipe extends EffectInfo {
         final int lineCount = descriptionLines.size();
 
 
-        final int maxLinesPerPage = (EffectCategory.RECIPE_HEIGHT - 35 - listH) / (minecraft.font.lineHeight + EffectCategory.LINE_SPACING);
+        final int maxLinesPerPage = (Constants.RECIPE_HEIGHT - 35 - listH) / (minecraft.font.lineHeight + Constants.LINE_SPACING);
         final int pageCount = divideCeil(lineCount, maxLinesPerPage);
         for (int i = 0; i < pageCount; i++) {
             int startLine = i * maxLinesPerPage;

@@ -16,7 +16,7 @@ import mezz.jei.common.input.ClickableIngredient;
 import mezz.jei.common.util.ImmutableRect2i;
 import net.mehvahdjukaar.jeed.Jeed;
 import net.mehvahdjukaar.jeed.api.IEffectScreenExtension;
-import net.mehvahdjukaar.jeed.common.EffectCategory;
+import net.mehvahdjukaar.jeed.common.Constants;
 import net.mehvahdjukaar.jeed.common.IPlugin;
 import net.mehvahdjukaar.jeed.common.ScreenExtensionsHandler;
 import net.mehvahdjukaar.jeed.plugin.jei.display.EffectInfoRecipe;
@@ -131,7 +131,7 @@ public class JEIPlugin implements IModPlugin, IPlugin {
 
     @Override
     public int getMaxTextWidth() {
-        return EffectCategory.RECIPE_WIDTH;
+        return Constants.RECIPE_WIDTH;
     }
 
 
