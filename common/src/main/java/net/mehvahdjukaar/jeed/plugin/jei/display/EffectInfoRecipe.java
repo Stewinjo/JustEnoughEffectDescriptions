@@ -88,7 +88,7 @@ public class EffectInfoRecipe extends EffectWindowEntry {
         Minecraft minecraft = Minecraft.getInstance();
         List<FormattedText> descriptionLinesWrapped = new ArrayList<>();
         for (FormattedText descriptionLine : descriptionLines) {
-            List<FormattedText> textLines = minecraft.font.getSplitter().splitLines(descriptionLine, Jeed.PLUGIN.getMaxTextWidth(), Style.EMPTY);
+            List<FormattedText> textLines = minecraft.font.getSplitter().splitLines(descriptionLine, Constants.RECIPE_WIDTH, Style.EMPTY);
             descriptionLinesWrapped.addAll(textLines);
         }
         return descriptionLinesWrapped;

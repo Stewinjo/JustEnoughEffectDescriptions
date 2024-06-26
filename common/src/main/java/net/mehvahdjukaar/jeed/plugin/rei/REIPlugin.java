@@ -73,11 +73,6 @@ public class REIPlugin implements REIClientPlugin, IPlugin {
     }
 
     @Override
-    public int getMaxTextWidth() {
-        return RECIPE_WIDTH - EffectInfoDisplayCategory.SIZE_DIFF * 2;
-    }
-
-    @Override
     public void registerScreens(ScreenRegistry registry) {
         registry.registerFocusedStack((screen, mouse) -> {
             var ext = ScreenExtensionsHandler.getExtension(screen);

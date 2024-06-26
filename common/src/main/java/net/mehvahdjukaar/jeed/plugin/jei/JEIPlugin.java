@@ -16,7 +16,6 @@ import mezz.jei.common.input.ClickableIngredient;
 import mezz.jei.common.util.ImmutableRect2i;
 import net.mehvahdjukaar.jeed.Jeed;
 import net.mehvahdjukaar.jeed.api.IEffectScreenExtension;
-import net.mehvahdjukaar.jeed.common.Constants;
 import net.mehvahdjukaar.jeed.common.IPlugin;
 import net.mehvahdjukaar.jeed.common.ScreenExtensionsHandler;
 import net.mehvahdjukaar.jeed.plugin.jei.display.EffectInfoRecipe;
@@ -48,6 +47,7 @@ public class JEIPlugin implements IModPlugin, IPlugin {
     public static IIngredientVisibility JEI_INGREDIENT_VISIBILITY;
 
     public JEIPlugin() {
+        if (Jeed.EMI) return;
         Jeed.PLUGIN = this;
     }
 
@@ -58,11 +58,15 @@ public class JEIPlugin implements IModPlugin, IPlugin {
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registry) {
+        if (Jeed.EMI) return;
+
         registry.addRecipeCategories(new EffectInfoRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
     }
 
     @Override
     public void registerIngredients(IModIngredientRegistration registration) {
+        if (Jeed.EMI) return;
+
         registration.register(EFFECT_INGREDIENT_TYPE,
                 Jeed.getEffectList().stream().map(MobEffectInstance::new).toList(),
                 new EffectInstanceHelper(), EffectInstanceRenderer.INSTANCE);
@@ -75,6 +79,8 @@ public class JEIPlugin implements IModPlugin, IPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registry) {
+        if (Jeed.EMI) return;
+
         JEI_INGREDIENT_VISIBILITY = registry.getIngredientVisibility();
         JEI_HELPERS = registry.getJeiHelpers();
 
@@ -86,6 +92,8 @@ public class JEIPlugin implements IModPlugin, IPlugin {
 
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
+        if (Jeed.EMI) return;
+
         for (var e : ScreenExtensionsHandler.EXTENSIONS.entrySet()) {
             Class<? extends AbstractContainerScreen<?>> screenClass = (Class<? extends AbstractContainerScreen<?>>) e.getKey();
             IEffectScreenExtension<AbstractContainerScreen<?>> effect = (IEffectScreenExtension<AbstractContainerScreen<?>>) e.getValue();
@@ -95,13 +103,8 @@ public class JEIPlugin implements IModPlugin, IPlugin {
         }
     }
 
-    public static class ScreenExtension<T extends AbstractContainerScreen<?>> implements IGuiContainerHandler<T> {
-
-        private final IEffectScreenExtension<T> ext;
-
-        public ScreenExtension(IEffectScreenExtension<T> ext) {
-            this.ext = ext;
-        }
+    public record ScreenExtension<T extends AbstractContainerScreen<?>>
+            (IEffectScreenExtension<T> ext) implements IGuiContainerHandler<T> {
 
         @Override
         public Optional<IClickableIngredient<?>> getClickableIngredientUnderMouse(T containerScreen, double mouseX, double mouseY) {
@@ -118,20 +121,19 @@ public class JEIPlugin implements IModPlugin, IPlugin {
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
+        if (Jeed.EMI) return;
+
         registration.addRecipeCatalyst(Items.POTION.getDefaultInstance(), EffectInfoRecipe.TYPE);
     }
 
     @Override
     public void onClickedEffect(MobEffectInstance effect, double x, double y, int button) {
+        if (Jeed.EMI) return;
+
         var focus = JEIPlugin.JEI_HELPERS.getFocusFactory().createFocus(RecipeIngredientRole.INPUT, JEIPlugin.EFFECT_INGREDIENT_TYPE, effect);
 
         IRecipesGui recipesGui = JEIPlugin.JEI_RUNTIME.getRecipesGui();
         recipesGui.show(focus);
-    }
-
-    @Override
-    public int getMaxTextWidth() {
-        return Constants.RECIPE_WIDTH;
     }
 
 

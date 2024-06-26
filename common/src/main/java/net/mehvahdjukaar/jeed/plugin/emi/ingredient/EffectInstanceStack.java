@@ -1,16 +1,27 @@
 package net.mehvahdjukaar.jeed.plugin.emi.ingredient;
 
+import com.google.common.collect.Lists;
+import dev.emi.emi.EmiPort;
+import dev.emi.emi.EmiUtil;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.config.EmiConfig;
 import net.mehvahdjukaar.jeed.common.EffectRenderer;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.alchemy.PotionUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 public class EffectInstanceStack extends EmiStack {
@@ -65,7 +76,24 @@ public class EffectInstanceStack extends EmiStack {
 
     @Override
     public List<Component> getTooltipText() {
-        return EffectRenderer.getTooltipsWithDescription(effect, TooltipFlag.NORMAL, false, false);
+        Minecraft client = Minecraft.getInstance();
+        return EffectRenderer.getTooltipsWithDescription(effect,
+                client.options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL,
+                false, false);
+    }
+
+    @Override
+    public List<ClientTooltipComponent> getTooltip() {
+        List<ClientTooltipComponent> list = Lists.newArrayList();
+        list.addAll(getTooltipText().stream().map(EmiPort::ordered).map(ClientTooltipComponent::create).toList());
+        ResourceLocation id = this.getId();
+        if (EmiConfig.appendModId && id != null) {
+            String mod = EmiUtil.getModName(id.getNamespace());
+            list.add(ClientTooltipComponent.create(EmiPort.ordered(EmiPort.literal(mod, ChatFormatting.BLUE, ChatFormatting.ITALIC))));
+        }
+
+        list.addAll(super.getTooltip());
+        return list;
     }
 
     @Override
@@ -73,5 +101,13 @@ public class EffectInstanceStack extends EmiStack {
         return effect.getEffect().getDisplayName();
     }
 
+    @Override
+    public ItemStack getItemStack() {
+        return PotionUtils.setCustomEffects(new ItemStack(Items.POTION), Collections.singletonList(normalize()));
+    }
 
+    public MobEffectInstance normalize() {
+        return new MobEffectInstance(effect.getEffect(), 30 * 20, 0, effect.isAmbient(),
+                effect.isVisible(), effect.showIcon(), effect.hiddenEffect, effect.getFactorData());
+    }
 }
