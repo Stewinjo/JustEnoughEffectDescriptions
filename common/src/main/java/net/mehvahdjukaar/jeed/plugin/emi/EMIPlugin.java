@@ -2,9 +2,7 @@ package net.mehvahdjukaar.jeed.plugin.emi;
 
 import dev.emi.emi.api.*;
 import dev.emi.emi.api.stack.EmiRegistryAdapter;
-import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.stack.EmiStackInteraction;
-import mezz.jei.api.gui.handlers.IGuiContainerHandler;
 import net.mehvahdjukaar.jeed.Jeed;
 import net.mehvahdjukaar.jeed.api.IEffectScreenExtension;
 import net.mehvahdjukaar.jeed.common.IPlugin;
@@ -13,14 +11,11 @@ import net.mehvahdjukaar.jeed.plugin.emi.display.EffectInfoRecipe;
 import net.mehvahdjukaar.jeed.plugin.emi.display.EffectInfoRecipeCategory;
 import net.mehvahdjukaar.jeed.plugin.emi.ingredient.EffectIngredientSerializer;
 import net.mehvahdjukaar.jeed.plugin.emi.ingredient.EffectInstanceStack;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.block.Blocks;
 
 @EmiEntrypoint
 public class EMIPlugin implements EmiPlugin, IPlugin {
@@ -40,18 +35,12 @@ public class EMIPlugin implements EmiPlugin, IPlugin {
         for (MobEffect e : Jeed.getEffectList()) {
             registry.addRecipe(EffectInfoRecipe.create(e));
         }
-        registry.addWorkstation(CATEGORY, EmiStack.of(Blocks.BEACON));
-        registry.addWorkstation(CATEGORY, EmiStack.of(Items.POTION));
-        registry.addWorkstation(CATEGORY, EmiStack.of(Items.SPLASH_POTION));
-        registry.addWorkstation(CATEGORY, EmiStack.of(Items.LINGERING_POTION));
-        registry.addWorkstation(CATEGORY, EmiStack.of(Items.SUSPICIOUS_STEW));
 
         for (var e : ScreenExtensionsHandler.EXTENSIONS.entrySet()) {
-            Class<? extends AbstractContainerScreen<?>> screenClass = (Class<? extends AbstractContainerScreen<?>>) e.getKey();
-            IEffectScreenExtension<AbstractContainerScreen<?>> effect = (IEffectScreenExtension<AbstractContainerScreen<?>>) e.getValue();
-            EmiStackProvider extension = new ScreenExtension<>(effect);
+            var screenClass = (Class<AbstractContainerScreen<?>>) e.getKey();
+            var effect = (IEffectScreenExtension<AbstractContainerScreen<?>>) e.getValue();
 
-            registry.addStackProvider(screenClass, extension);
+            registry.addStackProvider(screenClass, new ScreenExtension<>(effect));
         }
     }
 
@@ -73,7 +62,7 @@ public class EMIPlugin implements EmiPlugin, IPlugin {
 
         @Override
         public EmiStackInteraction getStackAt(T screen, int x, int y) {
-            var clicked = ext.getEffectAtPosition(screen, x, y, IEffectScreenExtension.CallReason.MOUSE_CLICKED);
+            var clicked = ext.getEffectAtPosition(screen, x, y, IEffectScreenExtension.CallReason.RECIPE_KEY);
             if (clicked != null) {
                 return new EmiStackInteraction(new EffectInstanceStack(clicked));
             }

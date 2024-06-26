@@ -5,7 +5,9 @@ import net.mehvahdjukaar.jeed.Jeed;
 import net.mehvahdjukaar.jeed.api.IEffectScreenExtension;
 import net.mehvahdjukaar.jeed.api.JeedAPI;
 import net.minecraft.client.gui.screens.inventory.BeaconScreen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.world.effect.MobEffectInstance;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,6 +18,8 @@ public class NativeCompat {
 
     public static void init() {
         JeedAPI.registerScreenExtension(EffectRenderingInventoryScreen.class, INVENTORY_EXTENSION);
+        JeedAPI.registerScreenExtension(CreativeModeInventoryScreen.class, INVENTORY_EXTENSION);
+        JeedAPI.registerScreenExtension(InventoryScreen.class, INVENTORY_EXTENSION);
         JeedAPI.registerScreenExtension(BeaconScreen.class, BEACON_EXTENSION);
     }
 
@@ -35,7 +39,7 @@ public class NativeCompat {
 
 
     @SuppressWarnings("all")
-    public static final IEffectScreenExtension<EffectRenderingInventoryScreen> INVENTORY_EXTENSION = new IEffectScreenExtension<EffectRenderingInventoryScreen>() {
+    public static final IEffectScreenExtension INVENTORY_EXTENSION = new IEffectScreenExtension< EffectRenderingInventoryScreen>() {
 
         @Nullable
         @Override

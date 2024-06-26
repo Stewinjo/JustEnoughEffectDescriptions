@@ -7,7 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.Comparator;
 
 public final class Constants {
-    public static int RECIPE_WIDTH = Jeed.EMI ? 134 : 160;
+    public static int RECIPE_WIDTH = Jeed.EMI ? 144 : 160;
     public static int RECIPE_HEIGHT = Jeed.EMI ? 130 : 125;
     public static int LINE_SPACING = 2;
     public static int SLOT_W = 19;

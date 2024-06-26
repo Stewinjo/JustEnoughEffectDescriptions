@@ -106,8 +106,10 @@ public class EffectInstanceDefinition implements EntryDefinition<MobEffectInstan
 
     @Override
     public @Nullable ItemStack cheatsAs(EntryStack<MobEffectInstance> entry, MobEffectInstance value) {
-        return PotionUtils.setCustomEffects(new ItemStack(Items.POTION),
+        var item = PotionUtils.setCustomEffects(new ItemStack(Items.POTION),
                 Collections.singletonList(normalize(entry, value)));
+        item.getOrCreateTag().putInt("CustomPotionColor", value.getEffect().getColor());
+        return item;
     }
 
     @Override

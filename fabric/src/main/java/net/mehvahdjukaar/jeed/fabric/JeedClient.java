@@ -32,6 +32,8 @@ public class JeedClient {
                                         mouseX, mouseY, ext.showDurationOnTooltip());
                             }
                         });
+                        if (Jeed.EMI) return;
+
                         ScreenMouseEvents.afterMouseClick(screen).register((screen1, mouseX, mouseY, button) -> {
                             var effect = ext.getEffectAtPosition(screen1, mouseX, mouseY, IEffectScreenExtension.CallReason.MOUSE_CLICKED);
                             if (effect != null) {

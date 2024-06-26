@@ -6,6 +6,7 @@ import net.mehvahdjukaar.jeed.api.IEffectScreenExtension;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.TooltipFlag;
@@ -16,7 +17,7 @@ import java.util.Map;
 
 public class ScreenExtensionsHandler {
 
-    public static final Map<Class<? extends Screen>, IEffectScreenExtension<? extends Screen>> EXTENSIONS = new IdentityHashMap<>();
+    public static final Map<Class<? extends AbstractContainerScreen<?>>, IEffectScreenExtension<? extends AbstractContainerScreen<?>>> EXTENSIONS = new IdentityHashMap<>();
 
     @SuppressWarnings("unchecked")
     public static <T extends Screen, E extends IEffectScreenExtension<T>> E getExtension(T screen) {
@@ -31,11 +32,11 @@ public class ScreenExtensionsHandler {
         return null;
     }
 
-    public static <T extends Screen> void registerScreenExtension(Class<T> screenClass, IEffectScreenExtension<T> extension) {
+    public static <T extends AbstractContainerScreen<?>> void registerScreenExtension(Class<T> screenClass, IEffectScreenExtension<T> extension) {
         EXTENSIONS.put(screenClass, extension);
     }
 
-    public static <T extends Screen> void unRegisterExtension(Class<T> screenClass) {
+    public static <T extends AbstractContainerScreen<?>> void unRegisterExtension(Class<T> screenClass) {
         EXTENSIONS.remove(screenClass);
     }
 

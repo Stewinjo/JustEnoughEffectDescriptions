@@ -93,7 +93,7 @@ public abstract class EffectWindowEntry {
         return effectProvidingItems;
     }
 
-    public static List<Ingredient> computeEffectProviders(MobEffect effect) {
+    public static List<ItemStack> computeEffectProviders(MobEffect effect) {
 
         ItemStackList list = new ItemStackList();
 
@@ -140,11 +140,11 @@ public abstract class EffectWindowEntry {
         var stat = STATIC_CACHE.get().get(effect);
         if (stat != null) list.addAll(stat);
 
-        return groupIngredients(list);
+        return list;
     }
 
 
-    private static List<Ingredient> groupIngredients(List<ItemStack> ingredients) {
+    public static List<Ingredient> groupIngredients(List<ItemStack> ingredients) {
         Map<Item, Ingredient> map = new HashMap<>();
         for (ItemStack stack : ingredients) {
             map.merge(stack.getItem(), Ingredient.of(stack), EffectWindowEntry::mergeIngredients);

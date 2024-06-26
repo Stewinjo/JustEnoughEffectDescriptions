@@ -1,6 +1,7 @@
 package net.mehvahdjukaar.jeed.api;
 
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.effect.MobEffectInstance;
 import org.jetbrains.annotations.Nullable;
 
@@ -8,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 @FunctionalInterface
 public interface IEffectScreenExtension<T extends Screen> {
 
-    IEffectScreenExtension NO_OP = (screen, mouseX, mouseY, isForTooltip) -> null;
+    IEffectScreenExtension<?> NO_OP = (screen, mouseX, mouseY, isForTooltip) -> null;
 
     @Nullable
     MobEffectInstance getEffectAtPosition(T screen, double mouseX, double mouseY, CallReason callReason);

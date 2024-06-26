@@ -95,9 +95,9 @@ public class JEIPlugin implements IModPlugin, IPlugin {
         if (Jeed.EMI) return;
 
         for (var e : ScreenExtensionsHandler.EXTENSIONS.entrySet()) {
-            Class<? extends AbstractContainerScreen<?>> screenClass = (Class<? extends AbstractContainerScreen<?>>) e.getKey();
-            IEffectScreenExtension<AbstractContainerScreen<?>> effect = (IEffectScreenExtension<AbstractContainerScreen<?>>) e.getValue();
-            ScreenExtension<AbstractContainerScreen<?>> extension = new ScreenExtension<>(effect);
+            var screenClass = (Class<AbstractContainerScreen<?>>) e.getKey();
+            var effect = (IEffectScreenExtension<AbstractContainerScreen<?>>) e.getValue();
+            var extension = new ScreenExtension<>(effect);
 
             registration.addGuiContainerHandler(screenClass, extension);
         }

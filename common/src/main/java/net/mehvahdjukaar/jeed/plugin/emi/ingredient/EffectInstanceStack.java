@@ -103,7 +103,9 @@ public class EffectInstanceStack extends EmiStack {
 
     @Override
     public ItemStack getItemStack() {
-        return PotionUtils.setCustomEffects(new ItemStack(Items.POTION), Collections.singletonList(normalize()));
+        var item = PotionUtils.setCustomEffects(new ItemStack(Items.POTION), Collections.singletonList(normalize()));
+        item.getOrCreateTag().putInt("CustomPotionColor", effect.getEffect().getColor());
+        return item;
     }
 
     public MobEffectInstance normalize() {

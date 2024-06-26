@@ -17,6 +17,8 @@ public class EffectInfoRecipeCategory extends EmiRecipeCategory {
         //this.slotBackground = guiHelper.getSlotDrawable();
     }
 
+
+
     @Override
     public Component getName() {
         return Constants.LOCALIZED_NAME;

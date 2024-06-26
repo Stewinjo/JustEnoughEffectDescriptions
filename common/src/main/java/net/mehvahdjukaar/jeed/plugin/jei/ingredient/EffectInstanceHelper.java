@@ -60,8 +60,10 @@ public class EffectInstanceHelper implements IIngredientHelper<MobEffectInstance
 
     @Override
     public ItemStack getCheatItemStack(MobEffectInstance ingredient) {
-        return PotionUtils.setCustomEffects(new ItemStack(Items.POTION),
+        var item = PotionUtils.setCustomEffects(new ItemStack(Items.POTION),
                 Collections.singletonList(normalizeIngredient(ingredient)));
+        item.getOrCreateTag().putInt("CustomPotionColor", ingredient.getEffect().getColor());
+        return item;
     }
 
     @Override

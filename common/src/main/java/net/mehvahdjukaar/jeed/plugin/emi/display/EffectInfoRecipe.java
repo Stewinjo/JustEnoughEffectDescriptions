@@ -4,6 +4,7 @@ import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.widget.Bounds;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.runtime.EmiDrawContext;
@@ -28,7 +29,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static net.mehvahdjukaar.jeed.common.Constants.*;
@@ -36,7 +36,7 @@ import static net.mehvahdjukaar.jeed.common.Constants.*;
 public class EffectInfoRecipe extends EffectWindowEntry implements EmiRecipe {
 
     private final ResourceLocation id;
-    private final List<EmiIngredient> inputs;
+    private final List<EmiIngredient> catalysts;
     private final List<EmiIngredient> slotsContent;
     private final EmiStack outputs;
 
@@ -44,13 +44,16 @@ public class EffectInfoRecipe extends EffectWindowEntry implements EmiRecipe {
         super(effectInstance, List.of(description));
         this.id = id;
         this.outputs = new EffectInstanceStack(effectInstance);
-        var ingredientsList = computeEffectProviders(effectInstance.getEffect())
+        var providers = computeEffectProviders(effectInstance.getEffect());
+        var ingredientsList = groupIngredients(providers)
                 .stream().map(EmiIngredient::of).toList();
-        List<EmiIngredient> allInputs = new ArrayList<>();
-        allInputs.add(outputs);
-        allInputs.addAll(ingredientsList);
-        this.inputs = allInputs;
+        this.catalysts = providers.stream().map(Ingredient::of).map(EmiIngredient::of).toList();
         this.slotsContent = divideIntoSlots(ingredientsList, EmiIngredient::of);
+    }
+
+    @Override
+    public List<EmiIngredient> getCatalysts() {
+        return catalysts;
     }
 
     @Override
@@ -65,7 +68,7 @@ public class EffectInfoRecipe extends EffectWindowEntry implements EmiRecipe {
 
     @Override
     public List<EmiIngredient> getInputs() {
-        return inputs;
+        return List.of();
     }
 
     @Override
@@ -92,7 +95,7 @@ public class EffectInfoRecipe extends EffectWindowEntry implements EmiRecipe {
         name.setStyle(Style.EMPTY.withBold(true).withColor(TextColor.fromRgb(color)));
 
         Font font = Minecraft.getInstance().font;
-        int centerX = RECIPE_WIDTH / 2;
+        int centerX = widgets.getWidth() / 2;
         int nameX = (int) (centerX - font.width(name) / 2f);
         widgets.addText(name, nameX, 0, -1, true);
 
@@ -119,9 +122,14 @@ public class EffectInfoRecipe extends EffectWindowEntry implements EmiRecipe {
                 } else ingredient = EmiStack.EMPTY;
 
                 int sx = -1 + (int) ((float) centerX + (float) ROWS + (SLOT_W * ((slotId % SLOTS_PER_ROW) - SLOTS_PER_ROW / 2f)));
-                int sy = 1 + RECIPE_HEIGHT - SLOT_W * (rowsCount - (slotId / SLOTS_PER_ROW));
+                int sy = 1 + widgets.getHeight() - SLOT_W * (rowsCount - (slotId / SLOTS_PER_ROW));
 
-                SlotWidget slot = new SlotWidget(ingredient, sx, sy);
+                SlotWidget slot = new SlotWidget(ingredient, sx, sy) {
+                    @Override
+                    public void drawSlotHighlight(GuiGraphics draw, Bounds bounds) {
+                        if (!ingredient.isEmpty()) super.drawSlotHighlight(draw, bounds);
+                    }
+                };
                 widgets.add(slot);
             }
         }

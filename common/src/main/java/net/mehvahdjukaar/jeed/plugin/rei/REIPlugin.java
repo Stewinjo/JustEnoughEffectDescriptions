@@ -1,6 +1,7 @@
 package net.mehvahdjukaar.jeed.plugin.rei;
 
 import dev.architectury.event.CompoundEventResult;
+import me.shedaniel.math.Point;
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
 import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
@@ -21,6 +22,7 @@ import net.mehvahdjukaar.jeed.common.IPlugin;
 import net.mehvahdjukaar.jeed.plugin.rei.display.EffectInfoDisplay;
 import net.mehvahdjukaar.jeed.plugin.rei.display.EffectInfoDisplayCategory;
 import net.mehvahdjukaar.jeed.plugin.rei.ingredient.EffectInstanceDefinition;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -75,15 +77,23 @@ public class REIPlugin implements REIClientPlugin, IPlugin {
     @Override
     public void registerScreens(ScreenRegistry registry) {
         registry.registerFocusedStack((screen, mouse) -> {
-            var ext = ScreenExtensionsHandler.getExtension(screen);
-            if (ext != null) {
-                var e = ext.getEffectAtPosition(screen, mouse.x, mouse.y, IEffectScreenExtension.CallReason.RECIPE_KEY);
-                if (e != null) {
-                    return CompoundEventResult.interruptTrue(EntryStack.of(EFFECT_ENTRY_TYPE, e));
-                }
+            if(screen instanceof AbstractContainerScreen<?> as) {
+                return typed(mouse, as);
             }
             return CompoundEventResult.pass();
         });
+    }
+
+    private static <T extends AbstractContainerScreen<?>> CompoundEventResult<EntryStack<?>> typed(Point mouse, T as) {
+        var ext = ScreenExtensionsHandler.getExtension(as);
+
+        if (ext != null) {
+            var e = ext.getEffectAtPosition(as, mouse.x, mouse.y, IEffectScreenExtension.CallReason.RECIPE_KEY);
+            if (e != null) {
+                return CompoundEventResult.interruptTrue(EntryStack.of(EFFECT_ENTRY_TYPE, e));
+            }
+        }
+        return CompoundEventResult.pass();
     }
 
     @Override

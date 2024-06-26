@@ -2,6 +2,7 @@ package net.mehvahdjukaar.jeed.api;
 
 import net.mehvahdjukaar.jeed.common.ScreenExtensionsHandler;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -9,13 +10,15 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 /**
  * Register here extensions for your Screen classes where effects are rendered.
  * This internally just invokes fabric/forge render screen events to render tooltips when an effect is hovered and REI/JEI API to open the effect category when one is clicked
+ * <p>
+ * Just call this stuff in your mod initializer
  */
 public class JeedAPI {
 
     /**
      * You can pass here a superclasses, and it will apply to all its subclasses
      **/
-    public static <T extends Screen> void registerScreenExtension(Class<T> screenClass, IEffectScreenExtension<T> extension) {
+    public static <T extends AbstractContainerScreen<?>> void registerScreenExtension(Class<T> screenClass, IEffectScreenExtension<T> extension) {
         ScreenExtensionsHandler.registerScreenExtension(screenClass,extension);
     }
 
@@ -30,7 +33,7 @@ public class JeedAPI {
         disableExtension(EffectRenderingInventoryScreen.class);
     }
 
-    public static <T extends Screen> void disableExtension(Class<T> screenClass) {
+    public static <T extends AbstractContainerScreen> void disableExtension(Class<T> screenClass) {
         ScreenExtensionsHandler.unRegisterExtension(screenClass);
     }
 

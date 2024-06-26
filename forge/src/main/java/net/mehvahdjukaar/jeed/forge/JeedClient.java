@@ -33,7 +33,7 @@ public class JeedClient {
         currentExt = null;
         currentScreen = null;
     }
-    
+
     @SubscribeEvent
     public static void onScreenInit(ScreenEvent.Init.Post event) {
         storeExtension(event.getScreen());
@@ -68,6 +68,7 @@ public class JeedClient {
 
     @SubscribeEvent
     public static void onScreenMouseButton(ScreenEvent.MouseButtonPressed event) {
+        if (Jeed.EMI) return;
         if (currentExt != null) {
             Screen screen = event.getScreen();
             if (screen != currentScreen) {
