@@ -31,6 +31,8 @@ import net.minecraft.world.item.Items;
 
 import java.util.stream.Stream;
 
+import static net.mehvahdjukaar.jeed.common.Constants.RECIPE_WIDTH;
+
 @REIPluginClient
 public class REIPlugin implements REIClientPlugin, IPlugin {
 
@@ -72,7 +74,7 @@ public class REIPlugin implements REIClientPlugin, IPlugin {
 
     @Override
     public int getMaxTextWidth() {
-        return EffectInfoDisplayCategory.RECIPE_WIDTH - EffectInfoDisplayCategory.SIZE_DIFF * 2;
+        return RECIPE_WIDTH - EffectInfoDisplayCategory.SIZE_DIFF * 2;
     }
 
     @Override

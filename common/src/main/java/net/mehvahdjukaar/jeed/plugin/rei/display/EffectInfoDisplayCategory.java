@@ -94,12 +94,12 @@ public class EffectInfoDisplayCategory implements DisplayCategory<EffectInfoDisp
                 .disableBackground()
                 .markInput().entry(display.getOutputEntries().get(0).get(0)));
 
-        var slotContents = display.getOutputEntries();
+        var slotContents = display.getSlots();
         int listH = EffectWindowEntry.getListHeight(slotContents);
 
         widgets.add(new ScrollableTextWidget(new Rectangle(bounds.x + SIZE_DIFF,
                 rect2.getMaxY() + 1, bounds.width - 2 * SIZE_DIFF,
-                50 + Constants.MAX_BOX_HEIGHT - listH), display.getComponents()));
+                50 + Constants.MAX_BOX_HEIGHT - listH), display.getDescription()));
 
         if (listH != 0) {
 

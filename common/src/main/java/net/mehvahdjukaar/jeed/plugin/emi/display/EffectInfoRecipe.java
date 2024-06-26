@@ -6,6 +6,7 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.WidgetHolder;
+import dev.emi.emi.runtime.EmiDrawContext;
 import net.mehvahdjukaar.jeed.Jeed;
 import net.mehvahdjukaar.jeed.common.EffectWindowEntry;
 import net.mehvahdjukaar.jeed.common.HSLColor;
@@ -13,6 +14,7 @@ import net.mehvahdjukaar.jeed.plugin.emi.EMIPlugin;
 import net.mehvahdjukaar.jeed.plugin.emi.ingredient.EffectInstanceStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -20,6 +22,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -47,8 +50,7 @@ public class EffectInfoRecipe extends EffectWindowEntry implements EmiRecipe {
         allInputs.add(outputs);
         allInputs.addAll(ingredientsList);
         this.inputs = allInputs;
-        var ingredientsPerSlot = divideIntoSlots(ingredientsList);
-        this.slotsContent = ingredientsPerSlot.stream().map(EmiIngredient::of).toList();
+        this.slotsContent = divideIntoSlots(ingredientsList, EmiIngredient::of);
     }
 
     @Override
@@ -83,7 +85,6 @@ public class EffectInfoRecipe extends EffectWindowEntry implements EmiRecipe {
 
     @Override
     public void addWidgets(WidgetHolder widgets) {
-
         MobEffect mobEffect = effect.getEffect();
 
         MutableComponent name = (MutableComponent) mobEffect.getDisplayName();
@@ -92,10 +93,8 @@ public class EffectInfoRecipe extends EffectWindowEntry implements EmiRecipe {
 
         Font font = Minecraft.getInstance().font;
         int centerX = RECIPE_WIDTH / 2;
-        int centerY = RECIPE_HEIGHT / 2;
-        int x = (int) (centerX - font.width(name) / 2f);
-        widgets.addText(name, x, 0, -1, true);
-        //    widgets.addSlot(EffectInstanceStack.of(effect), 0, 0).large(true).recipeContext(this);
+        int nameX = (int) (centerX - font.width(name) / 2f);
+        widgets.addText(name, nameX, 0, -1, true);
 
         if (Jeed.hasEffectBox()) {
             widgets.addTexture(ContainerScreen.INVENTORY_LOCATION, centerX - 12, Y_OFFSET,
@@ -105,16 +104,8 @@ public class EffectInfoRecipe extends EffectWindowEntry implements EmiRecipe {
         widgets.add(new SlotWidget(outputs, centerX - 9, Y_OFFSET + 3)
                 .drawBack(false));
 
-        // widgets.add(new TextWidget())
-        //  widgets.addText(EmiPort.ordered(EmiPort.translatable("emi.cooking.experience", recipe.m_43750_())), 26, 28, -1, true);
-        // widgets.addSlot(input, 0, 4);
-        // widgets.addSlot(output, 56, 0).large(true).recipeContext(this);
 
         int listH = EffectWindowEntry.getListHeight(slotsContent);
-
-        // widgets.add(new ScrollableTextWidget(new Rectangle(bounds.x + SIZE_DIFF,
-        //       rect2.getMaxY() + 1, bounds.width - 2 * SIZE_DIFF,
-        //     50 + EffectWindow.MAX_BOX_HEIGHT - listH), display.getComponents()));
 
         if (listH != 0) {
 
@@ -125,15 +116,41 @@ public class EffectInfoRecipe extends EffectWindowEntry implements EmiRecipe {
                 EmiIngredient ingredient;
                 if (slotId < slotsContent.size()) {
                     ingredient = slotsContent.get(slotId);
-                } else ingredient = EmiIngredient.of(Ingredient.EMPTY);
+                } else ingredient = EmiStack.EMPTY;
 
-                int sx = -1 + (int) ((float)centerX + (float) ROWS + (SLOT_W * ((slotId % SLOTS_PER_ROW) - SLOTS_PER_ROW / 2f)));
+                int sx = -1 + (int) ((float) centerX + (float) ROWS + (SLOT_W * ((slotId % SLOTS_PER_ROW) - SLOTS_PER_ROW / 2f)));
                 int sy = 1 + RECIPE_HEIGHT - SLOT_W * (rowsCount - (slotId / SLOTS_PER_ROW));
 
                 SlotWidget slot = new SlotWidget(ingredient, sx, sy);
                 widgets.add(slot);
             }
         }
+
+
+        int y = 2 * 18 + 4 + 1;
+        int lineCount = (widgets.getHeight() - y - listH) / font.lineHeight;
+        var lines = description.stream().flatMap(t -> font.split(t, getDisplayWidth() - 4).stream()).toList();
+        PageManager manager = new PageManager(lines, lineCount);
+        if (lineCount < lines.size()) {
+            widgets.addButton(2, 2, 12, 12, 0, 0, () -> true, (mouseX, mouseY, button) -> {
+                manager.scroll(-1);
+            });
+            widgets.addButton(widgets.getWidth() - 14, 2, 12, 12, 12, 0, () -> true, (mouseX, mouseY, button) -> {
+                manager.scroll(1);
+            });
+        }
+        widgets.addDrawable(0, y, 0, 0, (raw, mouseX, mouseY, delta) -> {
+            EmiDrawContext context = EmiDrawContext.wrap(raw);
+            int lo = manager.start();
+            for (int i = 0; i < lineCount; i++) {
+                int l = lo + i;
+                if (l >= manager.lines.size()) {
+                    return;
+                }
+                FormattedCharSequence text = manager.lines.get(l);
+                context.drawText(text, 0, y - y + i * font.lineHeight, 0);
+            }
+        });
 
     }
 
@@ -142,4 +159,31 @@ public class EffectInfoRecipe extends EffectWindowEntry implements EmiRecipe {
 
         return new EffectInfoRecipe(new MobEffectInstance(effect), text, BuiltInRegistries.MOB_EFFECT.getKey(effect));
     }
+
+    private static class PageManager {
+        public final List<FormattedCharSequence> lines;
+        public final int pageSize;
+        public int currentPage;
+
+        public PageManager(List<FormattedCharSequence> lines, int pageSize) {
+            this.lines = lines;
+            this.pageSize = pageSize;
+        }
+
+        public void scroll(int delta) {
+            currentPage += delta;
+            int totalPages = (lines.size() - 1) / pageSize + 1;
+            if (currentPage < 0) {
+                currentPage = totalPages - 1;
+            }
+            if (currentPage >= totalPages) {
+                currentPage = 0;
+            }
+        }
+
+        public int start() {
+            return currentPage * pageSize;
+        }
+    }
+
 }

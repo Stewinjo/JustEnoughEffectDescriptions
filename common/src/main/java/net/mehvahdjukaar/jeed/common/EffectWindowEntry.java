@@ -27,10 +27,10 @@ import net.minecraft.world.level.block.entity.BeaconBlockEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static net.mehvahdjukaar.jeed.common.Constants.ROWS;
-import static net.mehvahdjukaar.jeed.common.Constants.SLOTS_PER_ROW;
+import static net.mehvahdjukaar.jeed.common.Constants.*;
 
 public abstract class EffectWindowEntry {
 
@@ -159,38 +159,26 @@ public abstract class EffectWindowEntry {
         return list;
     }
 
-    private static Ingredient mergeIngredients(Ingredient i1, Ingredient i2) {
+    private static Ingredient mergeIngredients(Ingredient ingredient, Ingredient ingredient1) {
+        return mergeIngredients(List.of(ingredient, ingredient1));
+    }
+
+    public static Ingredient mergeIngredients(List<Ingredient> ingredients) {
         List<ItemStack> l = new ArrayList<>();
-        l.addAll(Arrays.stream(i1.getItems()).toList());
-        l.addAll(Arrays.stream(i2.getItems()).toList());
+        for (Ingredient i : ingredients) {
+            l.addAll(Arrays.stream(i.getItems()).toList());
+        }
         return Ingredient.of(l.toArray(new ItemStack[0]));
     }
 
     private static @NotNull ArrayList<Map.Entry<Item, Ingredient>> sortIngredients(Map<Item, Ingredient> map) {
         var entryList = new ArrayList<>(map.entrySet());
-        entryList.sort((entry1, entry2) -> {
-            ResourceLocation first = BuiltInRegistries.ITEM.getKey(entry1.getKey());
-            ResourceLocation second = BuiltInRegistries.ITEM.getKey(entry2.getKey());
-            String secondNamespace = second.getNamespace();
-            String firstNamespace = first.getNamespace();
-            String mc = "minecraft";
-            if (mc.equals(firstNamespace) && !mc.equals(secondNamespace)) {
-                return -1;
-            } else if (!mc.equals(firstNamespace) && mc.equals(secondNamespace)) {
-                return 1;
-            } else {
-                int pathComparison = firstNamespace.compareTo(secondNamespace);
-                if (pathComparison != 0) {
-                    return pathComparison;
-                } else {
-                    return second.getPath().compareTo(second.getPath());
-                }
-            }
-        });
+        entryList.sort((a, b) -> ID_COMPARATOR.compare(BuiltInRegistries.ITEM.getKey(a.getKey()),
+                BuiltInRegistries.ITEM.getKey(b.getKey())));
         return entryList;
     }
 
-    public static <T> List<List<T>> divideIntoSlots(List<T> ingredients) {
+    public static <T, I> List<I> divideIntoSlots(List<T> ingredients, Function<List<T>, I> mapper) {
 
         List<List<T>> slotContents = new ArrayList<>();
 
@@ -200,7 +188,7 @@ public abstract class EffectWindowEntry {
             if (slotContents.size() <= ind) slotContents.add(new ArrayList<>());
             slotContents.get(ind).add(ingredients.get(slotId));
         }
-        return slotContents;
+        return slotContents.stream().map(mapper).toList();
     }
 
     private static class ItemStackList extends ArrayList<ItemStack> {

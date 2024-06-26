@@ -10,15 +10,16 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Contract;
 
 import java.util.Collection;
 import java.util.List;
+
+import static net.mehvahdjukaar.jeed.common.Constants.ID_COMPARATOR;
 
 /**
  * Author: MehVahdJukaar
@@ -37,6 +38,7 @@ public class Jeed {
         return new ResourceLocation(MOD_ID, name);
     }
 
+    @Contract
     @ExpectPlatform
     public static Collection<String> getHiddenEffects() {
         throw new AssertionError();
@@ -96,6 +98,7 @@ public class Jeed {
     public static List<MobEffect> getEffectList() {
         return BuiltInRegistries.MOB_EFFECT.stream()
                 .filter(e -> !isTagged(e, BuiltInRegistries.MOB_EFFECT, HIDDEN) && !Jeed.getHiddenEffects().contains(BuiltInRegistries.MOB_EFFECT.getKey(e).toString()))
+                .sorted((a, b) -> ID_COMPARATOR.compare(BuiltInRegistries.MOB_EFFECT.getKey(a), BuiltInRegistries.MOB_EFFECT.getKey(b)))
                 .toList();
     }
 

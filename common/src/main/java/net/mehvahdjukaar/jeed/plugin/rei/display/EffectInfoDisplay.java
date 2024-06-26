@@ -17,8 +17,8 @@ import java.util.List;
 public class EffectInfoDisplay extends EffectWindowEntry implements Display {
 
     private final List<EntryIngredient> inputEntries;
+    private final List<List<EntryStack<?>>> slots;
     private final List<EntryIngredient> outputEntries;
-    private final List<Component> componentList;
 
     protected EffectInfoDisplay(MobEffectInstance effectInstance, Component description) {
         super(effectInstance, List.of(description));
@@ -27,11 +27,15 @@ public class EffectInfoDisplay extends EffectWindowEntry implements Display {
         this.outputEntries = List.of(EntryIngredient.of(EntryStack.of(REIPlugin.EFFECT_ENTRY_TYPE, effectInstance).normalize()));
         allInputs.addAll(outputEntries);
         this.inputEntries = allInputs.stream().toList();
-        this.componentList = List.of(description);
+        this.slots = divideIntoSlots(ingredientsList, e -> {
+            List<EntryStack<?>> l = new ArrayList<>();
+            EntryIngredients.ofIngredients(e).forEach(j -> l.addAll(j.castAsList()));
+            return l;
+        });
     }
 
-    public List<Component> getComponents() {
-        return componentList;
+    public List<List<EntryStack<?>>> getSlots() {
+        return slots;
     }
 
     @Override

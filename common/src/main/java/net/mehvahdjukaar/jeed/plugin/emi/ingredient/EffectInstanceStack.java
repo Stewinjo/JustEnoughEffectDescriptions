@@ -7,7 +7,9 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.item.TooltipFlag;
 
 import java.util.List;
 
@@ -19,6 +21,15 @@ public class EffectInstanceStack extends EmiStack {
 
     public EffectInstanceStack(MobEffectInstance effect) {
         this.effect = effect;
+    }
+
+    public EffectInstanceStack(MobEffect effect, long duration) {
+        this(new MobEffectInstance(effect, (int) duration));
+    }
+
+
+    public MobEffectInstance getEffect() {
+        return effect;
     }
 
     @Override
@@ -54,12 +65,13 @@ public class EffectInstanceStack extends EmiStack {
 
     @Override
     public List<Component> getTooltipText() {
-        return List.of();
+        return EffectRenderer.getTooltipsWithDescription(effect, TooltipFlag.NORMAL, false, false);
     }
 
     @Override
     public Component getName() {
         return effect.getEffect().getDisplayName();
     }
+
 
 }

@@ -26,10 +26,12 @@ public class EffectInfoRecipe extends EffectWindowEntry {
 
     public static final RecipeType<EffectInfoRecipe> TYPE = RecipeType.create(Jeed.MOD_ID, "effect_info", EffectInfoRecipe.class);
     protected final List<Ingredient> ingredients;
+    protected final List<Ingredient> slots;
 
     protected EffectInfoRecipe(MobEffectInstance effectInstance, List<Ingredient> ingredients, List<FormattedText> description) {
         super(effectInstance, description);
         this.ingredients = ingredients;
+        this.slots = divideIntoSlots(ingredients, EffectWindowEntry::mergeIngredients);
     }
 
     //TODO: re add

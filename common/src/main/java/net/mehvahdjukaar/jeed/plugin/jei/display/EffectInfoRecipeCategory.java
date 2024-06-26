@@ -116,7 +116,7 @@ public class EffectInfoRecipeCategory implements IRecipeCategory<EffectInfoRecip
 
         if (Jeed.hasIngredientList()) {
 
-            List<Ingredient> slotContents = recipe.ingredients;
+            List<Ingredient> slotContents = recipe.slots;
 
             int rowsCount = slotContents.size() <= SLOTS_PER_ROW ? 1 : ROWS;
 
