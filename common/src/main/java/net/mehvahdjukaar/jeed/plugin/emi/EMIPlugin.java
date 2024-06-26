@@ -16,6 +16,7 @@ public class EMIPlugin implements EmiPlugin {
 
     @Override
     public void register(EmiRegistry registry) {
+
         registry.addCategory(new EffectInfoRecipeCategory(EFFECTS_INFO_CATEGORY));
         Jeed.getEffectList().stream().map(MobEffectInstance::new)
                 .map(EffectInstanceStack::new).forEach(registry::addEmiStack);
