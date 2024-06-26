@@ -23,6 +23,9 @@
     ],
     "jei_mod_plugin": [
       "net.mehvahdjukaar.jeed.plugin.jei.JEIPlugin"
+    ],
+    "emi": [
+      "net.mehvahdjukaar.jeed.plugin.emi.EMIPlugin"
     ]
   },
   "mixins": [

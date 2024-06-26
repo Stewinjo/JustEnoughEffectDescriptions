@@ -1,6 +1,7 @@
-package net.mehvahdjukaar.jeed.plugin.jei.display;
+package net.mehvahdjukaar.jeed.plugin.emi.display;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import dev.emi.emi.api.render.EmiTexture;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -10,17 +11,20 @@ import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
-import mezz.jei.api.recipe.category.IRecipeCategory;
 import net.mehvahdjukaar.jeed.Jeed;
 import net.mehvahdjukaar.jeed.common.EffectCategory;
 import net.mehvahdjukaar.jeed.common.HSLColor;
 import net.mehvahdjukaar.jeed.plugin.jei.JEIPlugin;
+import net.mehvahdjukaar.jeed.plugin.jei.display.EffectBox;
+import net.mehvahdjukaar.jeed.plugin.jei.display.EffectInfoRecipe;
 import net.mehvahdjukaar.jeed.plugin.jei.ingredient.EffectInstanceRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.tabs.Tab;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.*;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.ItemStack;
@@ -28,20 +32,21 @@ import net.minecraft.world.item.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EffectRecipeCategory extends EffectCategory implements IRecipeCategory<EffectInfoRecipe> {
+public class EffectInfoRecipeCategory extends EmiRecipeCategory {
+    private final EffectCategory inner = new EffectCategory() {
+    };
 
-    private final IDrawable background;
-    private final IDrawable icon;
-    private final IDrawable slotBackground;
-    private final IDrawable effectBackground;
 
-    public EffectRecipeCategory(IGuiHelper guiHelper) {
-        this.background = guiHelper.createBlankDrawable(RECIPE_WIDTH, RECIPE_HEIGHT);
-        this.effectBackground = new EffectBox(); // guiHelper.createDrawable(ContainerScreen.INVENTORY_LOCATION, 141, 166, 24, 24);
+    public EffectInfoRecipeCategory(ResourceLocation id) {
+        super(id, new TabIcon());
+       // this.background = guiHelper.createBlankDrawable(RECIPE_WIDTH, RECIPE_HEIGHT);
+        //this.effectBackground = new EffectBox(); // guiHelper.createDrawable(ContainerScreen.INVENTORY_LOCATION, 141, 166, 24, 24);
 
-        this.icon = new TabIcon();
-        this.slotBackground = guiHelper.getSlotDrawable();
+        //this.slotBackground = guiHelper.getSlotDrawable();
     }
+
+
+/*
 
     @Override
     public RecipeType<EffectInfoRecipe> getRecipeType() {
@@ -139,5 +144,5 @@ public class EffectRecipeCategory extends EffectCategory implements IRecipeCateg
                         .addItemStacks(slotContents.get(slotId));
             }
         }
-    }
+    }*/
 }

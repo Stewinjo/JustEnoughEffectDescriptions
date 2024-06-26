@@ -16,7 +16,7 @@ dependencies {
     //modCompileOnly "me.shedaniel:RoughlyEnoughItems-api-forge:9.1.595"
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-forge:12.0.625"
 
-    modCompileOnly "dev.emi:emi-xplat-intermediary:1.0.19+${rootProject.minecraft_version}"
+    modCompileOnly "dev.emi:emi-xplat-intermediary:1.1.7+${rootProject.minecraft_version}"
 }
 
 publishing {

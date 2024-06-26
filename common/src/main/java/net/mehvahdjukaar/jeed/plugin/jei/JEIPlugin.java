@@ -20,7 +20,7 @@ import net.mehvahdjukaar.jeed.common.EffectCategory;
 import net.mehvahdjukaar.jeed.common.IPlugin;
 import net.mehvahdjukaar.jeed.common.ScreenExtensionsHandler;
 import net.mehvahdjukaar.jeed.plugin.jei.display.EffectInfoRecipe;
-import net.mehvahdjukaar.jeed.plugin.jei.display.EffectRecipeCategory;
+import net.mehvahdjukaar.jeed.plugin.jei.display.EffectInfoRecipeCategory;
 import net.mehvahdjukaar.jeed.plugin.jei.ingredient.EffectInstanceHelper;
 import net.mehvahdjukaar.jeed.plugin.jei.ingredient.EffectInstanceRenderer;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -28,7 +28,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.Items;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -59,7 +58,7 @@ public class JEIPlugin implements IModPlugin, IPlugin {
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registry) {
-        registry.addRecipeCategories(new EffectRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
+        registry.addRecipeCategories(new EffectInfoRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
     }
 
     @Override
