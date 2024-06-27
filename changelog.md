@@ -1,1 +1,3 @@
-made code extra fool proof without degrading performance
+- added native EMI compat
+- changed and polished many little things
+- added more translation lines
