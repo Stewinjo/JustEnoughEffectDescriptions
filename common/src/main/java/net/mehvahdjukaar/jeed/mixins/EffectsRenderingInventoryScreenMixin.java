@@ -52,10 +52,10 @@ public abstract class EffectsRenderingInventoryScreenMixin {
 
     @ModifyArg(method = "renderBackgrounds",
             require = 2,
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Lnet/minecraft/resources/ResourceLocation;IIIIII)V")
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIII)V")
     )
 
-    private ResourceLocation captureHoveredEffect(ResourceLocation res, int x, int y, int u, int v, int width, int height) {
+    private ResourceLocation captureHoveredEffect(ResourceLocation sprite, int x, int y, int width, int height) {
         if (jeed$hoveredEffect != null) {
             Matrix4f last = jeed$guiGraphics.pose().last().pose();
             Vector4i vec = new Vector4i(x, y, 0, 1);
@@ -67,7 +67,7 @@ public abstract class EffectsRenderingInventoryScreenMixin {
                 NativeCompat.setInventoryEffect(jeed$hoveredEffect, width < 33);
             }
         }
-        return res;
+        return sprite;
     }
 
     @Inject(method = "renderEffects", at = @At(value = "INVOKE",
