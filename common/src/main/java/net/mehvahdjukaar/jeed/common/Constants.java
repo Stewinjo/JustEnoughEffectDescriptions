@@ -10,7 +10,7 @@ public final class Constants {
     public static final ResourceLocation EFFECT_BACKGROUND_SMALL = ResourceLocation.withDefaultNamespace(
             "gui/sprites/hud/effect_background");
     public static final ResourceLocation EFFECT_BACKGROUND_SMALL_SPRITE = ResourceLocation.withDefaultNamespace(
-            "hud/effect_background_small");
+            "hud/effect_background");
 
     public static int RECIPE_WIDTH = Jeed.EMI ? 144 : 160;
     public static int RECIPE_HEIGHT = Jeed.EMI ? 130 : 125;

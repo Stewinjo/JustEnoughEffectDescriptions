@@ -24,11 +24,16 @@ public class EffectInfoDisplay extends EffectInfo implements Display {
 
     protected EffectInfoDisplay(MobEffectInstance effectInstance, Component description) {
         super(effectInstance, List.of(description));
-        List<ItemStack> providers = computeEffectProviders(effectInstance.getEffect().value());
+        MobEffect effect = effectInstance.getEffect().value();
+        List<ItemStack> providers = computeEffectProviders(effect);
         var ingredientsList = groupIngredients(providers);
         var allInputs = new ArrayList<>(ingredientsList.stream().map(EntryIngredients::ofIngredient).toList());
         this.outputEntries = List.of(EntryIngredient.of(EntryStack.of(REIPlugin.EFFECT_ENTRY_TYPE, effectInstance).normalize()));
         allInputs.addAll(outputEntries);
+
+        allInputs.addAll(computeEffectToEffectProviders(effect).stream()
+                .map(e -> EntryStack.of(REIPlugin.EFFECT_ENTRY_TYPE, effectInstance).normalize()).map(EntryIngredient::of).toList());
+
         this.inputEntries = allInputs.stream().toList();
         this.slots = divideIntoSlots(providers, EntryIngredients::ofItemStacks);
     }

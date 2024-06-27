@@ -20,10 +20,13 @@ import net.minecraft.world.level.Level;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 public record EffectProviderRecipe(Optional<Holder<MobEffect>> effect,
-                                   NonNullList<Ingredient> providers) implements Recipe<SingleRecipeInput> {
+                                   NonNullList<Ingredient> providers,
+                                   List<Holder<MobEffect>> effectProviders)
+        implements Recipe<SingleRecipeInput> {
 
     @Override
     public String getGroup() {
@@ -79,19 +82,17 @@ public record EffectProviderRecipe(Optional<Holder<MobEffect>> effect,
 
         private static final MapCodec<EffectProviderRecipe> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
                 BuiltInRegistries.MOB_EFFECT.holderByNameCodec().optionalFieldOf("effect").forGetter((shapelessRecipe) -> shapelessRecipe.effect),
-                Ingredient.CODEC_NONEMPTY.listOf().fieldOf("providers").flatXmap((list) -> {
+                Ingredient.CODEC_NONEMPTY.listOf().optionalFieldOf("providers", List.of()).flatXmap((list) -> {
                     Ingredient[] ingredients = list.stream().filter((ingredient) -> !ingredient.isEmpty()).toArray(Ingredient[]::new);
-                    if (ingredients.length == 0) {
-                        return DataResult.error(() -> "No providers for effect providers recipe");
-                    } else {
-                        return DataResult.success(NonNullList.of(Ingredient.EMPTY, ingredients));
-                    }
-                }, DataResult::success).forGetter((shapelessRecipe) -> shapelessRecipe.providers)
+                    return DataResult.success(NonNullList.of(Ingredient.EMPTY, ingredients));
+                }, DataResult::success).forGetter((shapelessRecipe) -> shapelessRecipe.providers),
+                BuiltInRegistries.MOB_EFFECT.holderByNameCodec().listOf().optionalFieldOf("effect_providers", List.of()).forGetter((r) -> r.effectProviders)
         ).apply(instance, EffectProviderRecipe::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, EffectProviderRecipe> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.optional(ByteBufCodecs.holderRegistry(Registries.MOB_EFFECT)), EffectProviderRecipe::effect,
                 Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.collection(NonNullList::createWithCapacity)), EffectProviderRecipe::providers,
+                ByteBufCodecs.holderRegistry(Registries.MOB_EFFECT).apply(ByteBufCodecs.list()), EffectProviderRecipe::effectProviders,
                 EffectProviderRecipe::new);
 
         @Override

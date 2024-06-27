@@ -2,7 +2,6 @@ package net.mehvahdjukaar.jeed.plugin.emi.display;
 
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
-import dev.emi.emi.api.render.EmiRenderable;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Bounds;
@@ -29,6 +28,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static net.mehvahdjukaar.jeed.common.Constants.*;
@@ -38,16 +38,22 @@ public class EffectInfoRecipe extends EffectInfo implements EmiRecipe {
     private final ResourceLocation id;
     private final List<EmiIngredient> catalysts;
     private final List<EmiIngredient> slotsContent;
+    private final List<EmiIngredient> inputEffects;
     private final EmiStack outputs;
 
     protected EffectInfoRecipe(MobEffectInstance effectInstance, Component description, ResourceLocation id) {
         super(effectInstance, List.of(description));
         this.id = id;
         this.outputs = new EffectInstanceStack(effectInstance);
-        var providers = computeEffectProviders(effectInstance.getEffect().value());
+        MobEffect effect = effectInstance.getEffect().value();
+        var providers = computeEffectProviders(effect);
         var ingredientsList = groupIngredients(providers)
                 .stream().map(EmiIngredient::of).toList();
         this.catalysts = providers.stream().map(Ingredient::of).map(EmiIngredient::of).toList();
+        ingredientsList = new ArrayList<>(ingredientsList);
+        this.inputEffects = computeEffectToEffectProviders(effect).stream()
+                .map(EffectInstanceStack::new).map(e -> ((EmiIngredient) e)).toList();
+        ingredientsList.addAll(inputEffects);
         this.slotsContent = divideIntoSlots(ingredientsList, EmiIngredient::of);
     }
 
@@ -68,7 +74,7 @@ public class EffectInfoRecipe extends EffectInfo implements EmiRecipe {
 
     @Override
     public List<EmiIngredient> getInputs() {
-        return List.of();
+        return inputEffects;
     }
 
     @Override

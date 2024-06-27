@@ -1,0 +1,7 @@
+{
+  "type": "jeed:effect_provider",
+  "effect": "minecraft:trial_omen",
+  "effect_providers": [
+    "minecraft:bad_omen"
+  ]
+}

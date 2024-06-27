@@ -97,6 +97,28 @@ public abstract class EffectInfo {
         return effectProvidingItems;
     }
 
+    public static List<Holder<MobEffect>> computeEffectToEffectProviders(MobEffect effect) {
+        List<Holder<MobEffect>> list = new ArrayList<>();
+
+        Level world = Minecraft.getInstance().level;
+        if (world != null) {
+
+            //effects
+            var recipes = world.getRecipeManager()
+                    .getAllRecipesFor(Jeed.getEffectProviderType());
+
+            for (var recipeHolder : recipes) {
+                EffectProviderRecipe recipe = recipeHolder.value();
+                for (var e : recipe.getEffects()) {
+                    if (e.value() == effect) {
+                        list.addAll(recipe.effectProviders());
+                    }
+                }
+            }
+        }
+        return list;
+    }
+
     public static List<ItemStack> computeEffectProviders(MobEffect effect) {
 
         ItemStackList list = new ItemStackList();
@@ -152,8 +174,8 @@ public abstract class EffectInfo {
         for (ItemStack stack : ingredients) {
             map.merge(stack.getItem(), Ingredient.of(stack), EffectInfo::mergeIngredients);
         }
-        var entryList = sortIngredients(map);
-
+        //  var entryList = sortIngredients(map);
+        var entryList = new ArrayList<>(map.entrySet());
         // Create a new LinkedHashMap and insert sorted entries
         List<Ingredient> list = new ArrayList<>();
         for (var entry : entryList) {

@@ -10,6 +10,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -37,7 +38,15 @@ public class EffectInstanceStack extends EmiStack {
     }
 
     public EffectInstanceStack(MobEffect effect, long duration) {
-        this(new MobEffectInstance(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(effect), (int) duration));
+        this(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(effect), (int) duration);
+    }
+
+    public EffectInstanceStack(Holder<MobEffect> effect, int duration) {
+        this(new MobEffectInstance(effect, duration));
+    }
+
+    public EffectInstanceStack(Holder<MobEffect> effect) {
+        this(effect, 30);
     }
 
 

@@ -1,3 +1,2 @@
-- added native EMI compat
-- changed and polished many little things
-- added more translation lines
+- updated to 1.21
+- effect providing recipes can also specify an effect that provides another effect instead of an item
