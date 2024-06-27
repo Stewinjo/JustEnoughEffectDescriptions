@@ -1,44 +1,43 @@
 
-modLoader="javafml" #mandatory
+modLoader = "javafml"
+loaderVersion = "${loader_version_range}"
 
-loaderVersion="[40,)" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
+license = "${mod_license}"
+issueTrackerURL = "${mod_github}/issues"
 
-license="ARR"
+[[mixins]]
+config = "${mod_id}.mixins.json"
+[[mixins]]
+config = "${mod_id}-forge.mixins.json"
 
-[[mods]] #mandatory
-
-modId= "jeed" #mandatory
-
-version = "${version}"
-
-displayName="Just Enough Effects Descriptions" #mandatory
-
-logoFile="icon.png" #optional
-
-credits="Mehvahdjukaar" #optional
-
-authors="MehVahdJukaar" #optional
-
-itemIcon="minecraft:painting" #catalogue icon
-
-description='''
-REI/JEI addon that shows effects and their descriptions
-'''
+[[mods]]
+modId = "${mod_id}"
+version = "${mod_version}"
+displayName = "${mod_name}"
+logoFile = "icon.png"
+authors = "${mod_authors}"
+credits = "${mod_credits}"
+description = '''${mod_description}'''
+modUrl = "${mod_homepage}"
+itemIcon="minecraft:potion" #catalogue icon
 
 [modproperties.jeed]
     catalogueItemIcon = "minecraft:potion" #catalogue icon
 
 
-[[dependencies.jeed]] #optional
-    modId="forge" #mandatory
-    mandatory=true #mandatory
-    versionRange="[40,)" #mandatory
-    ordering="NONE"
-    side="BOTH"
 
-[[dependencies.jeed]]
-    modId="minecraft"
-    mandatory=true
-    versionRange="[1.20,1.21)"
-    ordering="NONE"
-    side="BOTH"
+[[dependencies.${mod_id}]]
+modId = "neoforge"
+type = "required"
+versionRange = "${neo_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "minecraft"
+type = "required"
+versionRange = "[${minecraft_min_version},${minecraft_max_version})"
+ordering = "NONE"
+side = "BOTH"
+
+
