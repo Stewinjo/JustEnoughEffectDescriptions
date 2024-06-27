@@ -2,6 +2,7 @@ package net.mehvahdjukaar.jeed.plugin.emi.display;
 
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
+import dev.emi.emi.api.render.EmiRenderable;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.emi.emi.api.widget.Bounds;
@@ -16,9 +17,7 @@ import net.mehvahdjukaar.jeed.plugin.emi.ingredient.EffectInstanceStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
@@ -101,8 +100,8 @@ public class EffectInfoRecipe extends EffectInfo implements EmiRecipe {
         widgets.addText(name, nameX, 0, -1, true);
 
         if (Jeed.hasEffectBox()) {
-            widgets.addTexture(ContainerScreen.INVENTORY_LOCATION, centerX - 12, Y_OFFSET,
-                    24, 24, 141, 166);
+            widgets.add(new SpriteWidget(EFFECT_BACKGROUND_SMALL_SPRITE, centerX - 12, Y_OFFSET,
+                    24, 24));
         }
 
         widgets.add(new SlotWidget(outputs, centerX - 9, Y_OFFSET + 3)

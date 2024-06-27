@@ -81,8 +81,9 @@ public class EffectInfoDisplayCategory implements DisplayCategory<EffectInfoDisp
 
         Rectangle rect2 = rect.clone();
         rect2.grow(3, 3);
-        widgets.add(Widgets.createTexturedWidget(ContainerScreen.INVENTORY_LOCATION, rect2,
-                141f, 166f, 24, 24, 256, 256));
+        widgets.add(Widgets.createTexturedWidget(EFFECT_BACKGROUND_SMALL, rect2,
+                0, 0, 24, 32, 24, 24));
+
 
         widgets.add(Widgets.createSlot(rect)
                 .disableBackground()

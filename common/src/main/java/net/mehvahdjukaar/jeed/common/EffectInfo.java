@@ -111,7 +111,7 @@ public abstract class EffectInfo {
             for (var recipeHolder : recipes) {
                 EffectProviderRecipe recipe = recipeHolder.value();
                 for (var e : recipe.getEffects()) {
-                    if (e == effect) {
+                    if (e.value() == effect) {
                         for (var i : recipe.getIngredients()) {
                             list.addAll(List.of(i.getItems()));
                         }
@@ -126,7 +126,7 @@ public abstract class EffectInfo {
             for (var recipeHolder : potionRecipes) {
                 PotionProviderRecipe recipe = recipeHolder.value();
                 for (var potion : recipe.getPotions()) {
-                    if (potion.value().getEffects().stream().anyMatch(e -> e.getEffect() == effect)) {
+                    if (potion.value().getEffects().stream().anyMatch(e -> e.getEffect().value() == effect)) {
                         for (var ing : recipe.getIngredients()) {
                             for (var stack : ing.getItems()) {
                                 ItemStack copy = stack.copy();
