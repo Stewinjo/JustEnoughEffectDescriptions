@@ -3,19 +3,16 @@ package net.mehvahdjukaar.jeed.forge;
 import net.mehvahdjukaar.jeed.Jeed;
 import net.mehvahdjukaar.jeed.recipes.EffectProviderRecipe;
 import net.mehvahdjukaar.jeed.recipes.PotionProviderRecipe;
-import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
-import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.Collection;
@@ -85,7 +82,9 @@ public class JeedImpl {
                 .define("render_slots", false);
         suppressVanillaTooltips = builder.comment("Removes vanilla tooltips rendered when an effect renders small (square box)")
                 .define("replace_vanilla_tooltips", true);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, builder.build());
+
+        ModList.get().getModContainerById(Jeed.MOD_ID).get()
+                .registerConfig(ModConfig.Type.CLIENT, builder.build());
     }
 
     public static RecipeSerializer<?> getEffectProviderSerializer() {

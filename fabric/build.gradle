@@ -27,13 +27,16 @@ dependencies {
     shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) { transitive false }
 
 
-    modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:11.0.597"
+    modCompileOnly "me.shedaniel:RoughlyEnoughItems-fabric:16.0.729"
 
-    modCompileOnly("curse.maven:stylish-effects-543661:4582074")
-    modCompileOnly("curse.maven:puzzles-lib-495476:4499053")
+    modCompileOnly("curse.maven:stylish-effects-543661:5093407")
+    modCompileOnly("curse.maven:puzzles-lib-495476:5476061")
 
     modCompileOnly("curse.maven:architectury-api-419699:4476083")
     modCompileOnly("curse.maven:jei-238222:4494409")
+
+    modImplementation("curse.maven:emi-580555:5436758")
+
 }
 
 

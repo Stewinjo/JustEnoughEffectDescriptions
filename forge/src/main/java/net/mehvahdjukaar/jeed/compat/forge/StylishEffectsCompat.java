@@ -1,9 +1,9 @@
 package net.mehvahdjukaar.jeed.compat.forge;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import fuzs.stylisheffects.api.client.stylisheffects.v1.EffectScreenHandler;
-import fuzs.stylisheffects.api.client.stylisheffects.v1.MobEffectWidgetContext;
-import fuzs.stylisheffects.api.client.stylisheffects.v1.MobEffectWidgetEvent;
+import fuzs.stylisheffects.api.v1.client.EffectScreenHandler;
+import fuzs.stylisheffects.api.v1.client.MobEffectWidgetContext;
+import fuzs.stylisheffects.neoforge.api.v1.client.NeoForgeMobEffectWidgetEvent;
 import net.mehvahdjukaar.jeed.Jeed;
 import net.mehvahdjukaar.jeed.api.IEffectScreenExtension;
 import net.mehvahdjukaar.jeed.api.JeedAPI;
@@ -14,19 +14,18 @@ import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.List;
 
 public class StylishEffectsCompat<T extends EffectRenderingInventoryScreen<?>> implements IEffectScreenExtension<T> {
 
     public static void init() {
-        MinecraftForge.EVENT_BUS.addListener((final MobEffectWidgetEvent.MouseClicked evt) -> {
+        NeoForge.EVENT_BUS.addListener((final NeoForgeMobEffectWidgetEvent.MouseClicked evt) -> {
             Jeed.PLUGIN.onClickedEffect(evt.getContext().effectInstance(), evt.getMouseX(), evt.getMouseY(), evt.getButton());
             evt.setCanceled(true);
         });
-        MinecraftForge.EVENT_BUS.addListener((final MobEffectWidgetEvent.EffectTooltip evt) -> {
+        NeoForge.EVENT_BUS.addListener((final NeoForgeMobEffectWidgetEvent.EffectTooltip evt) -> {
             List<Component> lines = evt.getTooltipLines();
             if(!evt.getTooltipFlag().isAdvanced() && !InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), Minecraft.getInstance().options.keyShift.getKey().getValue())){
                 lines.remove(lines.size()-1);

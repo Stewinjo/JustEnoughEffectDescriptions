@@ -6,16 +6,16 @@ import net.mehvahdjukaar.jeed.common.ScreenExtensionsHandler;
 import net.mehvahdjukaar.jeed.compat.NativeCompat;
 import net.mehvahdjukaar.jeed.compat.forge.StylishEffectsCompat;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraftforge.client.event.ScreenEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModList;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModList;
+import net.neoforged.neoforge.client.event.ScreenEvent;
+import net.neoforged.neoforge.common.NeoForge;
 
 public class JeedClient {
 
 
     public static void init() {
-        MinecraftForge.EVENT_BUS.register(JeedClient.class);
+        NeoForge.EVENT_BUS.register(JeedClient.class);
 
         NativeCompat.init();
 

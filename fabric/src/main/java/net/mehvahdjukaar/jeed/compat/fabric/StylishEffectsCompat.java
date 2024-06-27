@@ -1,8 +1,9 @@
 package net.mehvahdjukaar.jeed.compat.fabric;
 
-import fuzs.stylisheffects.api.client.stylisheffects.v1.EffectScreenHandler;
-import fuzs.stylisheffects.api.client.stylisheffects.v1.MobEffectWidgetContext;
-import fuzs.stylisheffects.api.client.stylisheffects.v1.MobEffectWidgetEvents;
+import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.stylisheffects.api.v1.client.EffectScreenHandler;
+import fuzs.stylisheffects.api.v1.client.MobEffectWidgetContext;
+import fuzs.stylisheffects.api.v1.client.MobEffectWidgetEvents;
 import net.mehvahdjukaar.jeed.Jeed;
 import net.mehvahdjukaar.jeed.api.IEffectScreenExtension;
 import net.mehvahdjukaar.jeed.api.JeedAPI;
@@ -22,7 +23,7 @@ public class StylishEffectsCompat<T extends EffectRenderingInventoryScreen<?>> i
 
         MobEffectWidgetEvents.CLICKED.register((evt, screen, x, y, button) -> {
             Jeed.PLUGIN.onClickedEffect(evt.effectInstance(), x, y, button);
-            return true;
+            return EventResult.ALLOW;
         });
         MobEffectWidgetEvents.TOOLTIP.register((evt, lines, flag) -> {
             if (!flag.isAdvanced()) {

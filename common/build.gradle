@@ -21,7 +21,6 @@ dependencies {
     //modCompileOnly("curse.maven:roughly-enough-items-310111:5435024")
     modCompileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:16.0.729"
 
-
     //modCompileOnly "dev.emi:emi-xplat-intermediary:1.1.7+${rootProject.minecraft_version}"
 }
 
