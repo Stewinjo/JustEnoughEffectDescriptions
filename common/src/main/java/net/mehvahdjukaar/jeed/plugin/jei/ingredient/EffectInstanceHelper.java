@@ -8,8 +8,7 @@ import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.subtypes.UidContext;
 import net.mehvahdjukaar.jeed.plugin.jei.JEIPlugin;
 import net.minecraft.client.renderer.EffectInstance;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -17,10 +16,11 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class EffectInstanceHelper implements IIngredientHelper<MobEffectInstance> {
@@ -32,54 +32,49 @@ public class EffectInstanceHelper implements IIngredientHelper<MobEffectInstance
 
     @Override
     public String getDisplayName(MobEffectInstance ingredient) {
-        Component displayName = ingredient.getEffect().getDisplayName();
+        Component displayName = ingredient.getEffect().value().getDisplayName();
         return displayName.getString();
     }
 
     @Override
     public String getUniqueId(MobEffectInstance ingredient, UidContext uidContext) {
-        ResourceLocation registryName = BuiltInRegistries.MOB_EFFECT.getKey(ingredient.getEffect());
-        return "effect:" + registryName;
+        return "effect:" + getResourceLocation(ingredient);
     }
 
     @Override
     public ResourceLocation getResourceLocation(MobEffectInstance ingredient) {
-        ResourceLocation registryName = BuiltInRegistries.MOB_EFFECT.getKey(ingredient.getEffect());
-        if (registryName == null) {
-            String ingredientInfo = this.getErrorInfo(ingredient);
-            throw new IllegalStateException("effect.getRegistryName() returned null for: " + ingredientInfo);
-        } else {
-            return registryName;
-        }
+        return ingredient.getEffect().unwrapKey().get().location();
     }
 
     @Override
     public Iterable<Integer> getColors(MobEffectInstance ingredient) {
-        return Collections.singletonList(ingredient.getEffect().getColor());
+        return Collections.singletonList(ingredient.getEffect().value().getColor());
     }
 
     @Override
     public ItemStack getCheatItemStack(MobEffectInstance ingredient) {
-        var item = PotionUtils.setCustomEffects(new ItemStack(Items.POTION),
-                Collections.singletonList(normalizeIngredient(ingredient)));
-        item.getOrCreateTag().putInt("CustomPotionColor", ingredient.getEffect().getColor());
+        ItemStack item = new ItemStack(Items.POTION);
+        PotionContents potionContents = new PotionContents(Optional.empty(),
+                Optional.of(ingredient.getEffect().value().getColor()),
+                Collections.singletonList(normalize(ingredient)));
+        item.set(DataComponents.POTION_CONTENTS, potionContents);
         return item;
+    }
+
+    public MobEffectInstance normalize(MobEffectInstance value) {
+        return new MobEffectInstance(value.getEffect(), 30 * 20, 0, value.isAmbient(),
+                value.isVisible(), value.showIcon(), value.hiddenEffect);
     }
 
     @Override
     public Stream<ResourceLocation> getTagStream(MobEffectInstance ingredient) {
-        return BuiltInRegistries.MOB_EFFECT
-                .getResourceKey(ingredient.getEffect())
-                .flatMap(BuiltInRegistries.MOB_EFFECT::getHolder)
-                .map(Holder::tags)
-                .orElse(Stream.of())
-                .map(TagKey::location);
+        return ingredient.getEffect().tags().map(TagKey::location);
     }
 
     @Override
     public MobEffectInstance copyIngredient(MobEffectInstance ingredient) {
         return new MobEffectInstance(ingredient.getEffect(), ingredient.getDuration(), ingredient.getAmplifier(),
-                ingredient.isAmbient(), ingredient.isVisible(), ingredient.showIcon(), ingredient.hiddenEffect, ingredient.getFactorData());
+                ingredient.isAmbient(), ingredient.isVisible(), ingredient.showIcon(), ingredient.hiddenEffect);
     }
 
     @Override
@@ -93,9 +88,9 @@ public class EffectInstanceHelper implements IIngredientHelper<MobEffectInstance
             return "null";
         } else {
             ToStringHelper toStringHelper = MoreObjects.toStringHelper(EffectInstance.class);
-            MobEffect effect = ingredient.getEffect();
+            MobEffect effect = ingredient.getEffect().value();
             if (effect != null) {
-                Component displayName = ingredient.getEffect().getDisplayName();
+                Component displayName = effect.getDisplayName();
                 toStringHelper.add("Effect", displayName.getString());
             } else {
                 toStringHelper.add("Effect", "null");

@@ -121,13 +121,13 @@ dependencies {
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
 
-    modImplementation   ("curse.maven:jei-238222:4597711")
-    modImplementation "dev.emi:emi-forge:1.1.7+${minecraft_version}"
+    modImplementation ("curse.maven:jei-238222:5466551")
+    modImplementation("curse.maven:emi-580555:5436759")
 
-    modCompileOnly "me.shedaniel:RoughlyEnoughItems-forge:12.0.625"
+    modCompileOnly("curse.maven:roughly-enough-items-310111:5435024")
 
     //modRuntimeOnly("curse.maven:roughly-enough-items-hacks-521393:4402999")
-    modRuntimeOnly("curse.maven:architectury-api-419699:4581905")
+    modCompileOnly("curse.maven:architectury-api-419699:4581905")
     modCompileOnly("curse.maven:stylish-effects-543661:4582073")
     modCompileOnly("curse.maven:puzzles-lib-495476:4596893")
     //modRuntimeOnly("curse.maven:create-328085:4835191")
@@ -136,6 +136,6 @@ dependencies {
     //modImplementation ("curse.maven:jei-238222:3884337")
     //modImplementation ("curse.maven:configured-457570:4011355")
 
-    modImplementation("curse.maven:farmers-delight-398521:5051242")
+    modCompileOnly("curse.maven:farmers-delight-398521:5051242")
 
 }

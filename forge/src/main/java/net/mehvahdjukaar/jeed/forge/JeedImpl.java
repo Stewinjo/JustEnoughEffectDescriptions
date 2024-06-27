@@ -3,24 +3,25 @@ package net.mehvahdjukaar.jeed.forge;
 import net.mehvahdjukaar.jeed.Jeed;
 import net.mehvahdjukaar.jeed.recipes.EffectProviderRecipe;
 import net.mehvahdjukaar.jeed.recipes.PotionProviderRecipe;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Author: MehVahdJukaar
@@ -28,7 +29,7 @@ import java.util.List;
 @Mod(Jeed.MOD_ID)
 public class JeedImpl {
 
-    public JeedImpl() {
+    public JeedImpl(IEventBus bus) {
         if (!ModList.get().isLoaded("jei") && !ModList.get().isLoaded("roughlyenoughitems")
                 && !ModList.get().isLoaded("emi")) {
             Jeed.LOGGER.error("Jepp requires either JEI, REI or EMI mods. None of them was found");
@@ -36,7 +37,6 @@ public class JeedImpl {
 
         Jeed.EMI = ModList.get().isLoaded("emi");
 
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         RECIPES_SERIALIZERS.register(bus);
         RECIPE_TYPES.register(bus);
 
@@ -47,31 +47,31 @@ public class JeedImpl {
         }
     }
 
-    private static ForgeConfigSpec.BooleanValue effectBox;
-    private static ForgeConfigSpec.BooleanValue renderSlots;
-    private static ForgeConfigSpec.BooleanValue suppressVanillaTooltips;
-    private static ForgeConfigSpec.BooleanValue ingredientsList;
-    private static ForgeConfigSpec.BooleanValue effectColor;
-    private static ForgeConfigSpec.ConfigValue<List<? extends String>> hiddenEffects;
+    private static ModConfigSpec.BooleanValue effectBox;
+    private static ModConfigSpec.BooleanValue renderSlots;
+    private static ModConfigSpec.BooleanValue suppressVanillaTooltips;
+    private static ModConfigSpec.BooleanValue ingredientsList;
+    private static ModConfigSpec.BooleanValue effectColor;
+    private static ModConfigSpec.ConfigValue<List<? extends String>> hiddenEffects;
 
     private static final DeferredRegister<RecipeSerializer<?>> RECIPES_SERIALIZERS = DeferredRegister.create(
-            ForgeRegistries.RECIPE_SERIALIZERS, Jeed.MOD_ID);
+            Registries.RECIPE_SERIALIZER, Jeed.MOD_ID);
     private static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(
-            ForgeRegistries.RECIPE_TYPES, Jeed.MOD_ID);
+            Registries.RECIPE_TYPE, Jeed.MOD_ID);
 
-    public static final RegistryObject<RecipeType<EffectProviderRecipe>> EFFECT_PROVIDER_TYPE = RECIPE_TYPES.register(
+    public static final Supplier<RecipeType<EffectProviderRecipe>> EFFECT_PROVIDER_TYPE = RECIPE_TYPES.register(
             "effect_provider", () -> RecipeType.simple(Jeed.res("effect_provider")));
-    public static final RegistryObject<RecipeType<PotionProviderRecipe>> POTION_PROVIDER_TYPE = RECIPE_TYPES.register(
+    public static final Supplier<RecipeType<PotionProviderRecipe>> POTION_PROVIDER_TYPE = RECIPE_TYPES.register(
             "potion_provider", () -> RecipeType.simple(Jeed.res("potion_provider")));
 
-    public static final RegistryObject<RecipeSerializer<EffectProviderRecipe>> EFFECT_PROVIDER_SERIALIZER = RECIPES_SERIALIZERS.register(
+    public static final Supplier<RecipeSerializer<EffectProviderRecipe>> EFFECT_PROVIDER_SERIALIZER = RECIPES_SERIALIZERS.register(
             "effect_provider", EffectProviderRecipe.Serializer::new);
-    public static final RegistryObject<RecipeSerializer<PotionProviderRecipe>> POTION_PROVIDER_SERIALIZER = RECIPES_SERIALIZERS.register(
+    public static final Supplier<RecipeSerializer<PotionProviderRecipe>> POTION_PROVIDER_SERIALIZER = RECIPES_SERIALIZERS.register(
             "potion_provider", PotionProviderRecipe.Serializer::new);
 
 
     private static void createConfigs() {
-        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
 
         effectColor = builder.comment("Show effect colors in tooltip")
                 .define("effect_color", true);

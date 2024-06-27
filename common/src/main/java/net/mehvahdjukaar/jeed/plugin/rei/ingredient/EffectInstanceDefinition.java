@@ -10,7 +10,7 @@ import me.shedaniel.rei.api.common.entry.type.EntryType;
 import net.mehvahdjukaar.jeed.plugin.rei.REIPlugin;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
-import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -20,10 +20,11 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class EffectInstanceDefinition implements EntryDefinition<MobEffectInstance>, EntrySerializer<MobEffectInstance> {
@@ -70,13 +71,13 @@ public class EffectInstanceDefinition implements EntryDefinition<MobEffectInstan
     @Override
     public MobEffectInstance copy(EntryStack<MobEffectInstance> entry, MobEffectInstance value) {
         return new MobEffectInstance(value.getEffect(), value.getDuration(), value.getAmplifier(), value.isAmbient(),
-                value.isVisible(), value.showIcon(), value.hiddenEffect, value.getFactorData());
+                value.isVisible(), value.showIcon(), value.hiddenEffect);
     }
 
     @Override
     public MobEffectInstance normalize(EntryStack<MobEffectInstance> entry, MobEffectInstance value) {
         return new MobEffectInstance(value.getEffect(), 30 * 20, 0, value.isAmbient(),
-                value.isVisible(), value.showIcon(), value.hiddenEffect, value.getFactorData());
+                value.isVisible(), value.showIcon(), value.hiddenEffect);
     }
 
     @Override
@@ -106,9 +107,11 @@ public class EffectInstanceDefinition implements EntryDefinition<MobEffectInstan
 
     @Override
     public @Nullable ItemStack cheatsAs(EntryStack<MobEffectInstance> entry, MobEffectInstance value) {
-        var item = PotionUtils.setCustomEffects(new ItemStack(Items.POTION),
+        ItemStack item = new ItemStack(Items.POTION);
+        PotionContents potionContents = new PotionContents(Optional.empty(),
+                Optional.of(value.getEffect().value().getColor()),
                 Collections.singletonList(normalize(entry, value)));
-        item.getOrCreateTag().putInt("CustomPotionColor", value.getEffect().getColor());
+        item.set(DataComponents.POTION_CONTENTS, potionContents);
         return item;
     }
 
@@ -119,16 +122,12 @@ public class EffectInstanceDefinition implements EntryDefinition<MobEffectInstan
 
     @Override
     public Component asFormattedText(EntryStack<MobEffectInstance> entry, MobEffectInstance value) {
-        return value.getEffect().getDisplayName();
+        return value.getEffect().value().getDisplayName();
     }
 
     @Override
     public Stream<? extends TagKey<?>> getTagsFor(EntryStack<MobEffectInstance> entry, MobEffectInstance value) {
-        return BuiltInRegistries.MOB_EFFECT
-                .getResourceKey(value.getEffect())
-                .flatMap(BuiltInRegistries.MOB_EFFECT::getHolder)
-                .map(Holder::tags)
-                .orElse(Stream.of());
+        return value.getEffect().tags();
     }
 
     @Override
@@ -148,7 +147,7 @@ public class EffectInstanceDefinition implements EntryDefinition<MobEffectInstan
 
     @Override
     public CompoundTag save(EntryStack<MobEffectInstance> entry, MobEffectInstance value) {
-        return value.save(new CompoundTag());
+        return (CompoundTag) value.save();
     }
 
     @Override

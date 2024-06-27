@@ -1,11 +1,12 @@
 package net.mehvahdjukaar.jeed.common;
 
 import com.google.common.base.Suppliers;
-import com.mojang.datafixers.util.Pair;
 import net.mehvahdjukaar.jeed.Jeed;
 import net.mehvahdjukaar.jeed.recipes.EffectProviderRecipe;
 import net.mehvahdjukaar.jeed.recipes.PotionProviderRecipe;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
@@ -16,9 +17,8 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.SuspiciousStewItem;
-import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.component.SuspiciousStewEffects;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -62,32 +62,36 @@ public abstract class EffectWindowEntry {
 
                 ItemStack stew = new ItemStack(Items.SUSPICIOUS_STEW);
 
-                MobEffect effect = flowerblock.getSuspiciousEffect();
-                SuspiciousStewItem.saveMobEffect(stew, effect, 200);
-
-                effectProvidingItems.computeIfAbsent(effect, i -> (new ItemStackList())).add(stew);
+                SuspiciousStewEffects effects = flowerblock.getSuspiciousEffects();
+                stew.set(DataComponents.SUSPICIOUS_STEW_EFFECTS, effects);
+                for (var e : effects.effects()) {
+                    effectProvidingItems.computeIfAbsent(e.effect().value(),
+                            s -> (new ItemStackList())).add(stew);
+                }
             }
         }
 
         //foods
         for (Item i : BuiltInRegistries.ITEM) {
-            FoodProperties food = i.getFoodProperties();
+            FoodProperties food = i.getDefaultInstance().get(DataComponents.FOOD);
             if (food != null) {
 
                 ItemStack foodItem = new ItemStack(i);
-                for (Pair<MobEffectInstance, Float> pair : food.getEffects()) {
-                    MobEffectInstance first = pair.getFirst();
+                for (var possibleEffect : food.effects()) {
+                    MobEffectInstance first = possibleEffect.effect();
                     if (first != null) { //why is this nullable?? vanilla never puts null here nor its marked as such
-                        effectProvidingItems.computeIfAbsent(first.getEffect(), s -> (new ItemStackList())).add(foodItem);
+                        effectProvidingItems.computeIfAbsent(first.getEffect().value(),
+                                s -> (new ItemStackList())).add(foodItem);
                     }
                 }
             }
         }
 
         //beacon
-        for (MobEffect[] array : BeaconBlockEntity.BEACON_EFFECTS) {
-            for (MobEffect e : array) {
-                effectProvidingItems.computeIfAbsent(e, s -> (new ItemStackList())).add(Items.BEACON.getDefaultInstance());
+        for (var array : BeaconBlockEntity.BEACON_EFFECTS) {
+            for (var e : array) {
+                effectProvidingItems.computeIfAbsent(e.value(),
+                        s -> (new ItemStackList())).add(Items.BEACON.getDefaultInstance());
             }
         }
         return effectProvidingItems;
@@ -101,13 +105,14 @@ public abstract class EffectWindowEntry {
         if (world != null) {
 
             //effects
-            List<EffectProviderRecipe> recipes = world.getRecipeManager()
+            var recipes = world.getRecipeManager()
                     .getAllRecipesFor(Jeed.getEffectProviderType());
 
-            for (EffectProviderRecipe p : recipes) {
-                for (var e : p.getEffects()) {
+            for (var recipeHolder : recipes) {
+                EffectProviderRecipe recipe = recipeHolder.value();
+                for (var e : recipe.getEffects()) {
                     if (e == effect) {
-                        for (var i : p.getIngredients()) {
+                        for (var i : recipe.getIngredients()) {
                             list.addAll(List.of(i.getItems()));
                         }
                     }
@@ -115,20 +120,18 @@ public abstract class EffectWindowEntry {
             }
 
             //potions
-            List<PotionProviderRecipe> potionRecipes = world.getRecipeManager()
+            var potionRecipes = world.getRecipeManager()
                     .getAllRecipesFor(Jeed.getPotionProviderType());
 
-            for (PotionProviderRecipe p : potionRecipes) {
-                Collection<Potion> acceptablePotions = p.getPotions();
-                if (acceptablePotions.isEmpty()) {
-                    acceptablePotions = BuiltInRegistries.POTION.stream().toList();
-                }
-                for (Potion potion : acceptablePotions) {
-                    if (potion.getEffects().stream().anyMatch(e -> e.getEffect() == effect)) {
-                        for (var ing : p.getIngredients()) {
+            for (var recipeHolder : potionRecipes) {
+                PotionProviderRecipe recipe = recipeHolder.value();
+                for (var potion : recipe.getPotions()) {
+                    if (potion.value().getEffects().stream().anyMatch(e -> e.getEffect() == effect)) {
+                        for (var ing : recipe.getIngredients()) {
                             for (var stack : ing.getItems()) {
                                 ItemStack copy = stack.copy();
-                                PotionUtils.setPotion(copy, potion);
+                                PotionContents potionContents = new PotionContents(Optional.of(potion), Optional.empty(), List.of());
+                                copy.set(DataComponents.POTION_CONTENTS, potionContents);
                                 list.add(copy);
                             }
                         }
@@ -209,8 +212,8 @@ public abstract class EffectWindowEntry {
         }
     }
 
-    public static Component getDescription(MobEffect effect) {
-        ResourceLocation name = BuiltInRegistries.MOB_EFFECT.getKey(effect);
+    public static Component getDescription(Holder<MobEffect> effect) {
+        ResourceLocation name = effect.unwrapKey().get().location();
 
         String descriptionKey = "effect." + name.getNamespace() + "." + name.getPath() + ".description";
 

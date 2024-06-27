@@ -1,17 +1,12 @@
 package net.mehvahdjukaar.jeed.plugin.rei.display;
 
 import me.shedaniel.math.Point;
-import me.shedaniel.math.Rectangle;
 import me.shedaniel.rei.api.client.gui.Renderer;
 import me.shedaniel.rei.api.client.gui.widgets.Slot;
 import me.shedaniel.rei.api.client.gui.widgets.Widget;
 import me.shedaniel.rei.api.client.gui.widgets.Widgets;
 import me.shedaniel.rei.api.client.registry.display.DisplayCategory;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
-import me.shedaniel.rei.api.common.entry.EntryIngredient;
-import me.shedaniel.rei.api.common.entry.EntryStack;
-import me.shedaniel.rei.api.common.util.EntryIngredients;
-import me.shedaniel.rei.api.common.util.EntryStacks;
 import net.mehvahdjukaar.jeed.Jeed;
 import net.mehvahdjukaar.jeed.common.Constants;
 import net.mehvahdjukaar.jeed.common.EffectWindowEntry;
@@ -23,9 +18,8 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 
+import me.shedaniel.math.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,12 +61,12 @@ public class EffectInfoDisplayCategory implements DisplayCategory<EffectInfoDisp
     }
 
     @Override
-    public List<Widget> setupDisplay(EffectInfoDisplay display, Rectangle bounds) {
+    public List<Widget> setupDisplay(EffectInfoDisplay display, me.shedaniel.math.Rectangle bounds) {
         final List<Widget> widgets = new ArrayList<>();
 
         widgets.add(Widgets.createRecipeBase(bounds));
 
-        MobEffect effect = display.getEffect().getEffect();
+        MobEffect effect = display.getEffect().getEffect().value();
 
         MutableComponent name = (MutableComponent) effect.getDisplayName();
         int color = HSLColor.getProcessedColor(effect.getColor());

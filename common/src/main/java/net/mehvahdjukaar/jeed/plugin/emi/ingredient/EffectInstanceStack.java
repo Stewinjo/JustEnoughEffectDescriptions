@@ -10,8 +10,9 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
@@ -19,10 +20,11 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class EffectInstanceStack extends EmiStack {
     private static final EffectRenderer RENDERER = new EffectRenderer(false) {
@@ -35,7 +37,7 @@ public class EffectInstanceStack extends EmiStack {
     }
 
     public EffectInstanceStack(MobEffect effect, long duration) {
-        this(new MobEffectInstance(effect, (int) duration));
+        this(new MobEffectInstance(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(effect), (int) duration));
     }
 
 
@@ -46,7 +48,7 @@ public class EffectInstanceStack extends EmiStack {
     @Override
     public EmiStack copy() {
         return new EffectInstanceStack(new MobEffectInstance(effect.getEffect(), effect.getDuration(), effect.getAmplifier(),
-                effect.isAmbient(), effect.isVisible(), effect.showIcon(), effect.hiddenEffect, effect.getFactorData()));
+                effect.isAmbient(), effect.isVisible(), effect.showIcon(), effect.hiddenEffect));
     }
 
     @Override
@@ -60,8 +62,8 @@ public class EffectInstanceStack extends EmiStack {
     }
 
     @Override
-    public CompoundTag getNbt() {
-        return null;
+    public DataComponentPatch getComponentChanges() {
+        return DataComponentPatch.EMPTY;
     }
 
     @Override
@@ -71,7 +73,7 @@ public class EffectInstanceStack extends EmiStack {
 
     @Override
     public ResourceLocation getId() {
-        return BuiltInRegistries.MOB_EFFECT.getKey(effect.getEffect());
+        return effect.getEffect().unwrapKey().get().location();
     }
 
     @Override
@@ -98,18 +100,21 @@ public class EffectInstanceStack extends EmiStack {
 
     @Override
     public Component getName() {
-        return effect.getEffect().getDisplayName();
+        return effect.getEffect().value().getDisplayName();
     }
 
     @Override
     public ItemStack getItemStack() {
-        var item = PotionUtils.setCustomEffects(new ItemStack(Items.POTION), Collections.singletonList(normalize()));
-        item.getOrCreateTag().putInt("CustomPotionColor", effect.getEffect().getColor());
+        ItemStack item = new ItemStack(Items.POTION);
+        PotionContents potionContents = new PotionContents(Optional.empty(),
+                Optional.of(effect.getEffect().value().getColor()),
+                Collections.singletonList(normalize()));
+        item.set(DataComponents.POTION_CONTENTS, potionContents);
         return item;
     }
 
     public MobEffectInstance normalize() {
         return new MobEffectInstance(effect.getEffect(), 30 * 20, 0, effect.isAmbient(),
-                effect.isVisible(), effect.showIcon(), effect.hiddenEffect, effect.getFactorData());
+                effect.isVisible(), effect.showIcon(), effect.hiddenEffect);
     }
 }

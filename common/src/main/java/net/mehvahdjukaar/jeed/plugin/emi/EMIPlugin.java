@@ -12,6 +12,7 @@ import net.mehvahdjukaar.jeed.plugin.emi.display.EffectInfoRecipeCategory;
 import net.mehvahdjukaar.jeed.plugin.emi.ingredient.EffectIngredientSerializer;
 import net.mehvahdjukaar.jeed.plugin.emi.ingredient.EffectInstanceStack;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
@@ -32,7 +33,7 @@ public class EMIPlugin implements EmiPlugin, IPlugin {
         registry.addCategory(CATEGORY);
         Jeed.getEffectList().stream().map(MobEffectInstance::new)
                 .map(EffectInstanceStack::new).forEach(registry::addEmiStack);
-        for (MobEffect e : Jeed.getEffectList()) {
+        for (Holder<MobEffect> e : Jeed.getEffectList()) {
             registry.addRecipe(EffectInfoRecipe.create(e));
         }
 

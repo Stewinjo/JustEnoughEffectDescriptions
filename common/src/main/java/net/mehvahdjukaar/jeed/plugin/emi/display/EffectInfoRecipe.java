@@ -17,6 +17,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -162,7 +163,7 @@ public class EffectInfoRecipe extends EffectWindowEntry implements EmiRecipe {
 
     }
 
-    public static EffectInfoRecipe create(MobEffect effect) {
+    public static EffectInfoRecipe create(Holder<MobEffect> effect) {
         Component text = getDescription(effect);
 
         return new EffectInfoRecipe(new MobEffectInstance(effect), text, BuiltInRegistries.MOB_EFFECT.getKey(effect));

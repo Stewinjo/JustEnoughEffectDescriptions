@@ -1,47 +1,29 @@
 package net.mehvahdjukaar.jeed.recipes;
 
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.mehvahdjukaar.jeed.Jeed;
-import net.mehvahdjukaar.jeed.common.JsonHelper;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 
-public class EffectProviderRecipe implements Recipe<CraftingContainer> {
-
-    private final ResourceLocation id;
-    @Nullable
-    private final MobEffect effect;
-    private final NonNullList<Ingredient> providers;
-
-    public EffectProviderRecipe(ResourceLocation id, @Nullable MobEffect effect, NonNullList<Ingredient> providers) {
-        this.id = id;
-        this.effect = effect;
-        this.providers = providers;
-    }
-
-    @Override
-    public ResourceLocation getId() {
-        return this.id;
-    }
+public record EffectProviderRecipe(Optional<Holder<MobEffect>> effect,
+                                   NonNullList<Ingredient> providers) implements Recipe<SingleRecipeInput> {
 
     @Override
     public String getGroup() {
@@ -53,25 +35,24 @@ public class EffectProviderRecipe implements Recipe<CraftingContainer> {
         return providers;
     }
 
-    //let's hope this won't cause troubles
     @Override
-    public ItemStack getResultItem(RegistryAccess registryAccess) {
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public boolean matches(CraftingContainer inv, Level worldIn) {
+    public boolean matches(SingleRecipeInput recipeInput, Level level) {
         return false;
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer container, RegistryAccess registryAccess) {
+    public ItemStack assemble(SingleRecipeInput recipeInput, HolderLookup.Provider provider) {
         return ItemStack.EMPTY;
     }
 
     @Override
     public boolean canCraftInDimensions(int width, int height) {
         return false;
+    }
+
+    @Override
+    public ItemStack getResultItem(HolderLookup.Provider registries) {
+        return ItemStack.EMPTY;
     }
 
     @Override
@@ -89,69 +70,38 @@ public class EffectProviderRecipe implements Recipe<CraftingContainer> {
         return Jeed.getEffectProviderType();
     }
 
-    public Collection<MobEffect> getEffects() {
-        return effect == null ? BuiltInRegistries.MOB_EFFECT.stream().toList() : Collections.singletonList(effect);
+    public Collection<? extends Holder<MobEffect>> getEffects() {
+        return effect.isEmpty() ? BuiltInRegistries.MOB_EFFECT.holders().toList() : Collections.singletonList(effect.get());
     }
 
 
     public static class Serializer implements RecipeSerializer<EffectProviderRecipe> {
 
+        private static final MapCodec<EffectProviderRecipe> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
+                BuiltInRegistries.MOB_EFFECT.holderByNameCodec().optionalFieldOf("effect").forGetter((shapelessRecipe) -> shapelessRecipe.effect),
+                Ingredient.CODEC_NONEMPTY.listOf().fieldOf("providers").flatXmap((list) -> {
+                    Ingredient[] ingredients = list.stream().filter((ingredient) -> !ingredient.isEmpty()).toArray(Ingredient[]::new);
+                    if (ingredients.length == 0) {
+                        return DataResult.error(() -> "No providers for effect providers recipe");
+                    } else {
+                        return DataResult.success(NonNullList.of(Ingredient.EMPTY, ingredients));
+                    }
+                }, DataResult::success).forGetter((shapelessRecipe) -> shapelessRecipe.providers)
+        ).apply(instance, EffectProviderRecipe::new));
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, EffectProviderRecipe> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.optional(ByteBufCodecs.holderRegistry(Registries.MOB_EFFECT)), EffectProviderRecipe::effect,
+                Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.collection(NonNullList::createWithCapacity)), EffectProviderRecipe::providers,
+                EffectProviderRecipe::new);
+
         @Override
-        public EffectProviderRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
-
-            NonNullList<Ingredient> providers = JsonHelper.readIngredients(GsonHelper.getAsJsonArray(json, "providers"));
-
-            if (providers.isEmpty()) {
-                throw new JsonParseException("No effect providers for recipe");
-            } else {
-                var v = json.get("effect");
-                if (v == null) {
-                    throw new JsonParseException("Missing effect for recipe");
-                }
-                String effectID;
-                if (v instanceof JsonObject jo) {
-                    effectID = GsonHelper.getAsString(jo, "id");
-                } else effectID = v.getAsString();
-
-                MobEffect effect = null;
-                if (effectID != null && !effectID.equals("all") && !effectID.equals("minecraft:all")) {
-                    effect = JsonHelper.getEffect(new ResourceLocation(effectID));
-                }
-                return new EffectProviderRecipe(recipeId, effect, providers);
-            }
+        public MapCodec<EffectProviderRecipe> codec() {
+            return CODEC;
         }
 
         @Override
-        @Nullable
-        public EffectProviderRecipe fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
-            int i = buffer.readVarInt();
-            NonNullList<Ingredient> providers = NonNullList.withSize(i, Ingredient.EMPTY);
-
-            providers.replaceAll(ignored -> Ingredient.fromNetwork(buffer));
-            ResourceLocation id = buffer.readResourceLocation();
-
-            MobEffect effect = null;
-            if (!id.getPath().equals("all")) {
-                effect = JsonHelper.getEffect(id);
-            }
-            return new EffectProviderRecipe(recipeId, effect, providers);
-        }
-
-        @Override
-        public void toNetwork(FriendlyByteBuf buffer, EffectProviderRecipe recipe) {
-            buffer.writeVarInt(recipe.providers.size());
-
-            for (Ingredient result : recipe.providers) {
-                result.toNetwork(buffer);
-            }
-
-            ResourceLocation res;
-            if (recipe.effect == null) {
-                res = new ResourceLocation("all");
-            } else {
-                res = BuiltInRegistries.MOB_EFFECT.getKey(recipe.effect);
-            }
-            buffer.writeResourceLocation(res);
+        public StreamCodec<RegistryFriendlyByteBuf, EffectProviderRecipe> streamCodec() {
+            return STREAM_CODEC;
         }
     }
 }

@@ -4,6 +4,7 @@ import dev.architectury.injectables.annotations.ExpectPlatform;
 import net.mehvahdjukaar.jeed.common.IPlugin;
 import net.mehvahdjukaar.jeed.recipes.EffectProviderRecipe;
 import net.mehvahdjukaar.jeed.recipes.PotionProviderRecipe;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -35,7 +36,7 @@ public class Jeed {
     public static boolean EMI = false;
 
     public static ResourceLocation res(String name) {
-        return new ResourceLocation(MOD_ID, name);
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, name);
     }
 
     @Contract
@@ -91,14 +92,10 @@ public class Jeed {
 
     private static final TagKey<MobEffect> HIDDEN = TagKey.create(Registries.MOB_EFFECT, res("hidden"));
 
-    public static <T> boolean isTagged(T entry, Registry<T> registry, TagKey<T> tag) {
-        return registry.getHolder(registry.getId(entry)).map(h -> h.is(tag)).orElse(false);
-    }
-
-    public static List<MobEffect> getEffectList() {
-        return BuiltInRegistries.MOB_EFFECT.stream()
-                .filter(e -> !isTagged(e, BuiltInRegistries.MOB_EFFECT, HIDDEN) && !Jeed.getHiddenEffects().contains(BuiltInRegistries.MOB_EFFECT.getKey(e).toString()))
-                .sorted((a, b) -> ID_COMPARATOR.compare(BuiltInRegistries.MOB_EFFECT.getKey(a), BuiltInRegistries.MOB_EFFECT.getKey(b)))
+    public static List<Holder.Reference<MobEffect>> getEffectList() {
+        return BuiltInRegistries.MOB_EFFECT.holders()
+                .filter(e -> !e.is(HIDDEN) && !Jeed.getHiddenEffects().contains(e.key().toString()))
+                .sorted((a, b) -> ID_COMPARATOR.compare(a.key().location(), b.key().location()))
                 .toList();
     }
 
