@@ -9,7 +9,7 @@ import me.shedaniel.rei.api.client.registry.display.DisplayCategory;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import net.mehvahdjukaar.jeed.Jeed;
 import net.mehvahdjukaar.jeed.common.Constants;
-import net.mehvahdjukaar.jeed.common.EffectWindowEntry;
+import net.mehvahdjukaar.jeed.common.EffectInfo;
 import net.mehvahdjukaar.jeed.common.HSLColor;
 import net.mehvahdjukaar.jeed.plugin.rei.REIPlugin;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
@@ -89,7 +89,7 @@ public class EffectInfoDisplayCategory implements DisplayCategory<EffectInfoDisp
                 .markInput().entry(display.getOutputEntries().get(0).get(0)));
 
         var slotContents = display.getSlots();
-        int listH = EffectWindowEntry.getListHeight(slotContents);
+        int listH = EffectInfo.getListHeight(slotContents);
 
         widgets.add(new ScrollableTextWidget(new Rectangle(bounds.x + SIZE_DIFF,
                 rect2.getMaxY() + 1, bounds.width - 2 * SIZE_DIFF,

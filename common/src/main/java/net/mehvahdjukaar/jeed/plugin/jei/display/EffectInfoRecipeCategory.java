@@ -69,7 +69,7 @@ public class EffectInfoRecipeCategory implements IRecipeCategory<EffectInfoRecip
 
         Font font = Minecraft.getInstance().font;
 
-        MobEffect effect = recipe.getEffect().getEffect();
+        MobEffect effect = recipe.getEffect().getEffect().value();
 
 
         MutableComponent name = (MutableComponent) effect.getDisplayName();

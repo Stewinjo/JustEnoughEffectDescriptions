@@ -84,7 +84,7 @@ public class JEIPlugin implements IModPlugin, IPlugin {
         JEI_INGREDIENT_VISIBILITY = registry.getIngredientVisibility();
         JEI_HELPERS = registry.getJeiHelpers();
 
-        for (MobEffect e : Jeed.getEffectList()) {
+        for (var e : Jeed.getEffectList()) {
             List<EffectInfoRecipe> recipes = EffectInfoRecipe.create(e);
             registry.addRecipes(EffectInfoRecipe.TYPE, recipes);
         }

@@ -32,14 +32,14 @@ import java.util.function.Supplier;
 
 import static net.mehvahdjukaar.jeed.common.Constants.*;
 
-public abstract class EffectWindowEntry {
+public abstract class EffectInfo {
 
-    private static final Supplier<Map<MobEffect, List<ItemStack>>> STATIC_CACHE = Suppliers.memoize(EffectWindowEntry::buildStaticCache);
+    private static final Supplier<Map<MobEffect, List<ItemStack>>> STATIC_CACHE = Suppliers.memoize(EffectInfo::buildStaticCache);
 
     protected final List<FormattedText> description;
     protected final MobEffectInstance effect;
 
-    protected EffectWindowEntry(MobEffectInstance effectInstance, List<FormattedText> description) {
+    protected EffectInfo(MobEffectInstance effectInstance, List<FormattedText> description) {
         this.description = description;
         this.effect = effectInstance;
     }
@@ -150,7 +150,7 @@ public abstract class EffectWindowEntry {
     public static List<Ingredient> groupIngredients(List<ItemStack> ingredients) {
         Map<Item, Ingredient> map = new HashMap<>();
         for (ItemStack stack : ingredients) {
-            map.merge(stack.getItem(), Ingredient.of(stack), EffectWindowEntry::mergeIngredients);
+            map.merge(stack.getItem(), Ingredient.of(stack), EffectInfo::mergeIngredients);
         }
         var entryList = sortIngredients(map);
 

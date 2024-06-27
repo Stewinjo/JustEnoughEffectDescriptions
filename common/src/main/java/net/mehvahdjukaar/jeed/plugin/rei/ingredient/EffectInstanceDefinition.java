@@ -32,13 +32,9 @@ public class EffectInstanceDefinition implements EntryDefinition<MobEffectInstan
     @Override
     public void fillCrashReport(CrashReport report, CrashReportCategory category, EntryStack<MobEffectInstance> entry) {
         EntryDefinition.super.fillCrashReport(report, category, entry);
-        MobEffect effect = entry.getValue().getEffect();
-        if (effect != null) {
-            Component displayName = entry.getValue().getEffect().getDisplayName();
-            category.setDetail("Effect", displayName::getString);
-        } else {
-            category.setDetail("Effect", () -> "null");
-        }
+        MobEffect effect = entry.getValue().getEffect().value();
+        Component displayName = effect.getDisplayName();
+        category.setDetail("Effect", displayName::getString);
         category.setDetail("Duration", () -> String.valueOf(entry.getValue().getDuration()));
         category.setDetail("Amplifier", () -> String.valueOf(entry.getValue().getAmplifier()));
     }
@@ -60,7 +56,7 @@ public class EffectInstanceDefinition implements EntryDefinition<MobEffectInstan
 
     @Override
     public @Nullable ResourceLocation getIdentifier(EntryStack<MobEffectInstance> entry, MobEffectInstance value) {
-        return BuiltInRegistries.MOB_EFFECT.getKey(value.getEffect());
+        return value.getEffect().unwrapKey().get().location();
     }
 
     @Override

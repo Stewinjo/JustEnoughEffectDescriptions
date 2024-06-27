@@ -9,10 +9,12 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.MobEffectTextureManager;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -26,8 +28,11 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.alchemy.PotionContents;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +51,7 @@ public abstract class EffectRenderer {
     }
 
     public void render(GuiGraphics graphics, MobEffectInstance effectInstance, int x, int y, int width, int height) {
-        MobEffect effect = effectInstance.getEffect();
+        var effect = effectInstance.getEffect();
 
         MobEffectTextureManager textures = mc.getMobEffectTextures();
         TextureAtlasSprite sprite = textures.get(effect);
@@ -65,7 +70,7 @@ public abstract class EffectRenderer {
         List<Component> tooltip = new ArrayList<>();
         if (effectInstance != null) {
 
-            MobEffect effect = effectInstance.getEffect();
+            MobEffect effect = effectInstance.getEffect().value();
 
             String name = I18n.get(effect.getDescriptionId());
             int amp = effectInstance.getAmplifier();
@@ -76,7 +81,8 @@ public abstract class EffectRenderer {
             tooltip.add(Component.literal(name));
 
             if (showDuration) {
-                tooltip.add(MobEffectUtil.formatDuration(effectInstance, 1.0F));
+                tooltip.add(MobEffectUtil.formatDuration(effectInstance, 1.0F,
+                        Minecraft.getInstance().level.tickRateManager().tickrate()));
             }
 
             if (Jeed.hasEffectColor()) {
@@ -108,37 +114,38 @@ public abstract class EffectRenderer {
                         res.getPath() + ".description").withStyle(ChatFormatting.GRAY));
             } else {
 
-                List<Pair<Attribute, AttributeModifier>> list1 = Lists.newArrayList();
-                Map<Attribute, AttributeModifier> map = effect.getAttributeModifiers();
-                if (!map.isEmpty()) {
-                    for (Map.Entry<Attribute, AttributeModifier> entry : map.entrySet()) {
-                        AttributeModifier attributemodifier = entry.getValue();
-                        AttributeModifier attributemodifier1 = new AttributeModifier(attributemodifier.getName(), effect.getAttributeModifierValue(effectInstance.getAmplifier(), attributemodifier), attributemodifier.getOperation());
-                        list1.add(new Pair<>(entry.getKey(), attributemodifier1));
-                    }
-                }
-                if (!list1.isEmpty()) {
+                List<Pair<Holder<Attribute>, AttributeModifier>> attributes = Lists.newArrayList();
+
+                Holder<MobEffect> holder = effectInstance.getEffect();
+                holder.value().createModifiers(effectInstance.getAmplifier(), (holderx, attributeModifierx) -> {
+                    attributes.add(new Pair<>(holderx, attributeModifierx));
+                });
+
+
+
+                if (!attributes.isEmpty()) {
 
                     tooltip.add(Component.empty());
                     tooltip.add(Component.translatable("potion.whenDrank").withStyle(ChatFormatting.DARK_PURPLE));
 
-                    for (Pair<Attribute, AttributeModifier> pair : list1) {
-                        AttributeModifier attributemodifier2 = pair.getSecond();
-                        double d0 = attributemodifier2.getAmount();
-                        double d1;
-                        if (attributemodifier2.getOperation() != AttributeModifier.Operation.MULTIPLY_BASE && attributemodifier2.getOperation() != AttributeModifier.Operation.MULTIPLY_TOTAL) {
-                            d1 = attributemodifier2.getAmount();
+                    for (var pair : attributes) {
+                        AttributeModifier am = pair.getSecond();
+                        double amount = am.amount();
+                        double actualAmount;
+                        if (am.operation() !=  AttributeModifier.Operation.ADD_MULTIPLIED_BASE && am.operation() != AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL) {
+                            actualAmount = am.amount();
                         } else {
-                            d1 = attributemodifier2.getAmount() * 100.0D;
+                            actualAmount = am.amount() * 100.0D;
                         }
 
-                        if (d0 > 0.0D) {
-                            tooltip.add((Component.translatable("attribute.modifier.plus." + attributemodifier2.getOperation().toValue(),
-                                    ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d1), Component.translatable(pair.getFirst().getDescriptionId()))).withStyle(ChatFormatting.BLUE));
-                        } else if (d0 < 0.0D) {
-                            d1 = d1 * -1.0D;
-                            tooltip.add((Component.translatable("attribute.modifier.take." + attributemodifier2.getOperation().toValue(),
-                                    ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(d1), Component.translatable(pair.getFirst().getDescriptionId()))).withStyle(ChatFormatting.RED));
+                        var descriptionId = pair.getFirst().value().getDescriptionId();
+                        if (amount > 0.0D) {
+                            tooltip.add((Component.translatable("attribute.modifier.plus." + am.operation().id(),
+                                    ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(actualAmount), Component.translatable(descriptionId))).withStyle(ChatFormatting.BLUE));
+                        } else if (amount < 0.0D) {
+                            actualAmount = actualAmount * -1.0D;
+                            tooltip.add((Component.translatable("attribute.modifier.take." + am.operation().id(),
+                                    ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(actualAmount), Component.translatable(descriptionId))).withStyle(ChatFormatting.RED));
                         }
                     }
                 }

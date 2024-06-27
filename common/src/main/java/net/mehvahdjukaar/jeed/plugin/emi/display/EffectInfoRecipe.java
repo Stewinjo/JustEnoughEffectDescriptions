@@ -9,7 +9,7 @@ import dev.emi.emi.api.widget.SlotWidget;
 import dev.emi.emi.api.widget.WidgetHolder;
 import dev.emi.emi.runtime.EmiDrawContext;
 import net.mehvahdjukaar.jeed.Jeed;
-import net.mehvahdjukaar.jeed.common.EffectWindowEntry;
+import net.mehvahdjukaar.jeed.common.EffectInfo;
 import net.mehvahdjukaar.jeed.common.HSLColor;
 import net.mehvahdjukaar.jeed.plugin.emi.EMIPlugin;
 import net.mehvahdjukaar.jeed.plugin.emi.ingredient.EffectInstanceStack;
@@ -34,7 +34,7 @@ import java.util.List;
 
 import static net.mehvahdjukaar.jeed.common.Constants.*;
 
-public class EffectInfoRecipe extends EffectWindowEntry implements EmiRecipe {
+public class EffectInfoRecipe extends EffectInfo implements EmiRecipe {
 
     private final ResourceLocation id;
     private final List<EmiIngredient> catalysts;
@@ -45,7 +45,7 @@ public class EffectInfoRecipe extends EffectWindowEntry implements EmiRecipe {
         super(effectInstance, List.of(description));
         this.id = id;
         this.outputs = new EffectInstanceStack(effectInstance);
-        var providers = computeEffectProviders(effectInstance.getEffect());
+        var providers = computeEffectProviders(effectInstance.getEffect().value());
         var ingredientsList = groupIngredients(providers)
                 .stream().map(EmiIngredient::of).toList();
         this.catalysts = providers.stream().map(Ingredient::of).map(EmiIngredient::of).toList();
@@ -89,7 +89,7 @@ public class EffectInfoRecipe extends EffectWindowEntry implements EmiRecipe {
 
     @Override
     public void addWidgets(WidgetHolder widgets) {
-        MobEffect mobEffect = effect.getEffect();
+        MobEffect mobEffect = effect.getEffect().value();
 
         MutableComponent name = (MutableComponent) mobEffect.getDisplayName();
         int color = HSLColor.getProcessedColor(mobEffect.getColor());
@@ -109,7 +109,7 @@ public class EffectInfoRecipe extends EffectWindowEntry implements EmiRecipe {
                 .drawBack(false));
 
 
-        int listH = EffectWindowEntry.getListHeight(slotsContent);
+        int listH = EffectInfo.getListHeight(slotsContent);
 
         if (listH != 0) {
 
@@ -166,7 +166,7 @@ public class EffectInfoRecipe extends EffectWindowEntry implements EmiRecipe {
     public static EffectInfoRecipe create(Holder<MobEffect> effect) {
         Component text = getDescription(effect);
 
-        return new EffectInfoRecipe(new MobEffectInstance(effect), text, BuiltInRegistries.MOB_EFFECT.getKey(effect));
+        return new EffectInfoRecipe(new MobEffectInstance(effect), text, effect.unwrapKey().get().location());
     }
 
     private static class PageManager {

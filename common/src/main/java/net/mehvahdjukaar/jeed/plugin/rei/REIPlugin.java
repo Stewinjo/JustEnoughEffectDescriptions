@@ -39,7 +39,7 @@ import static net.mehvahdjukaar.jeed.common.Constants.RECIPE_WIDTH;
 public class REIPlugin implements REIClientPlugin, IPlugin {
 
     public static final CategoryIdentifier<EffectInfoDisplay> EFFECTS_INFO_CATEGORY = CategoryIdentifier.of(Jeed.res("effects"));
-    public static final EntryType<MobEffectInstance> EFFECT_ENTRY_TYPE = EntryType.deferred(new ResourceLocation("effect"));
+    public static final EntryType<MobEffectInstance> EFFECT_ENTRY_TYPE = EntryType.deferred(ResourceLocation.tryParse("effect"));
 
     public REIPlugin() {
         Jeed.PLUGIN = this;
@@ -53,7 +53,7 @@ public class REIPlugin implements REIClientPlugin, IPlugin {
 
     @Override
     public void registerDisplays(DisplayRegistry registry) {
-        for (MobEffect e : Jeed.getEffectList()) {
+        for (var e : Jeed.getEffectList()) {
             registry.add(EffectInfoDisplay.create(e));
         }
     }

@@ -50,9 +50,9 @@ public class ScrollableTextWidget extends WidgetWithBounds {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
         if (containsMouse(mouseX, mouseY)) {
-            scrolling.offset(ClothConfigInitializer.getScrollStep() * -amount, true);
+            scrolling.offset(ClothConfigInitializer.getScrollStep() * -scrollY, true);
             return true;
         }
         return false;

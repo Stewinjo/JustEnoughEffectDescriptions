@@ -1,20 +1,17 @@
 package net.mehvahdjukaar.jeed.plugin.jei.display;
 
-import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.recipe.RecipeType;
-import mezz.jei.api.runtime.IIngredientVisibility;
 import net.mehvahdjukaar.jeed.Jeed;
 import net.mehvahdjukaar.jeed.common.Constants;
-import net.mehvahdjukaar.jeed.common.EffectWindowEntry;
-import net.mehvahdjukaar.jeed.plugin.jei.JEIPlugin;
+import net.mehvahdjukaar.jeed.common.EffectInfo;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class EffectInfoRecipe extends EffectWindowEntry {
+public class EffectInfoRecipe extends EffectInfo {
 
     public static final RecipeType<EffectInfoRecipe> TYPE = RecipeType.create(Jeed.MOD_ID, "effect_info", EffectInfoRecipe.class);
     protected final List<Ingredient> ingredients;
@@ -31,7 +28,7 @@ public class EffectInfoRecipe extends EffectWindowEntry {
     protected EffectInfoRecipe(MobEffectInstance effectInstance, List<Ingredient> ingredients, List<FormattedText> description) {
         super(effectInstance, description);
         this.ingredients = ingredients;
-        this.slots = divideIntoSlots(ingredients, EffectWindowEntry::mergeIngredients);
+        this.slots = divideIntoSlots(ingredients, EffectInfo::mergeIngredients);
     }
 
     //TODO: re add
@@ -46,10 +43,10 @@ public class EffectInfoRecipe extends EffectWindowEntry {
                 .toList();
     }*/
 
-    public static List<EffectInfoRecipe> create(MobEffect effect) {
+    public static List<EffectInfoRecipe> create(Holder<MobEffect> effect) {
         Minecraft minecraft = Minecraft.getInstance();
         Component text = getDescription(effect);
-        List<Ingredient> inputs = groupIngredients(computeEffectProviders(effect));
+        List<Ingredient> inputs = groupIngredients(computeEffectProviders(effect.value()));
 
         int listH = getListHeight(inputs);
 

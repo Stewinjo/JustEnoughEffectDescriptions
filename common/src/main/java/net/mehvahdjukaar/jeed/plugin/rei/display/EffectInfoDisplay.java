@@ -5,8 +5,9 @@ import me.shedaniel.rei.api.common.display.Display;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.entry.EntryStack;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
-import net.mehvahdjukaar.jeed.common.EffectWindowEntry;
+import net.mehvahdjukaar.jeed.common.EffectInfo;
 import net.mehvahdjukaar.jeed.plugin.rei.REIPlugin;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -15,7 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EffectInfoDisplay extends EffectWindowEntry implements Display {
+public class EffectInfoDisplay extends EffectInfo implements Display {
 
     private final List<EntryIngredient> inputEntries;
     private final List<List<EntryStack<?>>> slots;
@@ -23,7 +24,7 @@ public class EffectInfoDisplay extends EffectWindowEntry implements Display {
 
     protected EffectInfoDisplay(MobEffectInstance effectInstance, Component description) {
         super(effectInstance, List.of(description));
-        List<ItemStack> providers = computeEffectProviders(effectInstance.getEffect());
+        List<ItemStack> providers = computeEffectProviders(effectInstance.getEffect().value());
         var ingredientsList = groupIngredients(providers);
         var allInputs = new ArrayList<>(ingredientsList.stream().map(EntryIngredients::ofIngredient).toList());
         this.outputEntries = List.of(EntryIngredient.of(EntryStack.of(REIPlugin.EFFECT_ENTRY_TYPE, effectInstance).normalize()));
@@ -51,7 +52,7 @@ public class EffectInfoDisplay extends EffectWindowEntry implements Display {
         return REIPlugin.EFFECTS_INFO_CATEGORY;
     }
 
-    public static EffectInfoDisplay create(MobEffect effect) {
+    public static EffectInfoDisplay create(Holder<MobEffect> effect) {
         Component text = getDescription(effect);
 
         return new EffectInfoDisplay(new MobEffectInstance(effect), text);
