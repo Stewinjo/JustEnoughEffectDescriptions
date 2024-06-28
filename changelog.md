@@ -1,2 +1,1 @@
-- updated to 1.21
-- effect providing recipes can also specify an effect that provides another effect instead of an item
+improved mixins

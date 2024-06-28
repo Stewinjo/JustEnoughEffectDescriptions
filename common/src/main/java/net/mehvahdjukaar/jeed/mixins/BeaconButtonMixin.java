@@ -2,6 +2,7 @@ package net.mehvahdjukaar.jeed.mixins;
 
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.screens.inventory.BeaconScreen;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffect;
 import org.spongepowered.asm.mixin.Mixin;
@@ -20,7 +21,7 @@ public abstract class BeaconButtonMixin extends AbstractButton {
     }
 
     @Inject(method = "setEffect", at=@At("RETURN"))
-    public void cancelTooltip(MobEffect effect, CallbackInfo ci){
+    public void cancelTooltip(Holder<MobEffect> effect, CallbackInfo ci){
         setTooltip(null);
     }
 
