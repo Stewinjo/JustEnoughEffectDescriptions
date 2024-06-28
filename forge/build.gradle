@@ -121,13 +121,13 @@ dependencies {
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
 
-    modCompileOnly ("curse.maven:jei-238222:5466551")
+    modImplementation ("curse.maven:jei-238222:5466551")
     modCompileOnly("curse.maven:emi-580555:5436759")
 
-    modImplementation("curse.maven:roughly-enough-items-310111:5435024")
+    modCompileOnly("curse.maven:roughly-enough-items-310111:5435024")
 
     //modRuntimeOnly("curse.maven:roughly-enough-items-hacks-521393:4402999")
-    modImplementation("curse.maven:architectury-api-419699:4581905")
+    modCompileOnly("curse.maven:architectury-api-419699:4581905")
     modCompileOnly("curse.maven:stylish-effects-543661:5093224")
     modCompileOnly("curse.maven:puzzles-lib-495476:5476063")
     //modRuntimeOnly("curse.maven:create-328085:4835191")

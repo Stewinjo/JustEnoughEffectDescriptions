@@ -10,7 +10,7 @@
   "conditions": [
     {
       "modid": "supplementaries",
-      "type": "forge:mod_loaded"
+      "type": "neoforge:mod_loaded"
     }
   ],
   "type": "jeed:potion_provider",

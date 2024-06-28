@@ -10,6 +10,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.conditions.ConditionContext;
 
 public class JeedClient {
 
@@ -48,7 +49,7 @@ public class JeedClient {
 
 
     @SubscribeEvent
-    public static void onScreenRender(ScreenEvent.Render event) {
+    public static void onScreenRender(ScreenEvent.Render.Pre event) {
         if (currentExt != null) {
             Screen screen = event.getScreen();
             if (screen != currentScreen) {
@@ -67,7 +68,7 @@ public class JeedClient {
     }
 
     @SubscribeEvent
-    public static void onScreenMouseButton(ScreenEvent.MouseButtonPressed event) {
+    public static void onScreenMouseButton(ScreenEvent.MouseButtonPressed.Pre event) {
         if (Jeed.EMI) return;
         if (currentExt != null) {
             Screen screen = event.getScreen();
@@ -80,6 +81,7 @@ public class JeedClient {
                         .getEffectAtPosition(screen, event.getMouseX(), event.getMouseY(), IEffectScreenExtension.CallReason.MOUSE_CLICKED);
                 if (effect != null) {
                     Jeed.PLUGIN.onClickedEffect(effect, event.getMouseX(), event.getMouseY(), event.getButton());
+                    event.setCanceled(true);
                 }
             }
         }

@@ -39,7 +39,7 @@ public class NativeCompat {
 
 
     @SuppressWarnings("all")
-    public static final IEffectScreenExtension INVENTORY_EXTENSION = new IEffectScreenExtension< EffectRenderingInventoryScreen>() {
+    public static final IEffectScreenExtension INVENTORY_EXTENSION = new IEffectScreenExtension<EffectRenderingInventoryScreen>() {
 
         @Nullable
         @Override
