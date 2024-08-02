@@ -1,3 +1,1 @@
-- added native EMI compat
-- changed and polished many little things
-- added more translation lines
+added a workaround for an issue due to an emi limitation, which made beacon buttons not clickable
