@@ -119,10 +119,10 @@ dependencies {
     neoForge "net.neoforged:neoforge:${neo_version}"
 
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
-    shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
+    shadowCommon(project(path: ":common", configuration: "transformProductionNeoForge")) { transitive = false }
 
-    modImplementation ("curse.maven:jei-238222:5466551")
-    modCompileOnly("curse.maven:emi-580555:5436759")
+    modCompileOnly ("curse.maven:jei-238222:5466551")
+    modImplementation("curse.maven:emi-580555:5436759")
 
     modCompileOnly("curse.maven:roughly-enough-items-310111:5435024")
 

@@ -1,1 +1,1 @@
-fixed a neoforge issue
+hacky workaround for EMI, fixing an issue preventing beacon buttons from being clicked due to an emi limitation.
