@@ -1,16 +1,15 @@
-package net.mehvahdjukaar.jeed.forge;
+package net.mehvahdjukaar.jeed.neoforge;
 
 import net.mehvahdjukaar.jeed.Jeed;
 import net.mehvahdjukaar.jeed.api.IEffectScreenExtension;
 import net.mehvahdjukaar.jeed.common.ScreenExtensionsHandler;
 import net.mehvahdjukaar.jeed.compat.NativeCompat;
-import net.mehvahdjukaar.jeed.compat.forge.StylishEffectsCompat;
+import net.mehvahdjukaar.jeed.compat.neoforge.StylishEffectsCompat;
 import net.minecraft.client.gui.screens.Screen;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.conditions.ConditionContext;
 
 public class JeedClient {
 

@@ -1,4 +1,4 @@
-package net.mehvahdjukaar.jeed.compat.forge;
+package net.mehvahdjukaar.jeed.compat.neoforge;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import fuzs.stylisheffects.api.v1.client.EffectScreenHandler;

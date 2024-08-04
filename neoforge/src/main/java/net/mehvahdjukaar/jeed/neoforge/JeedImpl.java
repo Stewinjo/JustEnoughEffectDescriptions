@@ -1,4 +1,4 @@
-package net.mehvahdjukaar.jeed.forge;
+package net.mehvahdjukaar.jeed.neoforge;
 
 import net.mehvahdjukaar.jeed.Jeed;
 import net.mehvahdjukaar.jeed.recipes.EffectProviderRecipe;

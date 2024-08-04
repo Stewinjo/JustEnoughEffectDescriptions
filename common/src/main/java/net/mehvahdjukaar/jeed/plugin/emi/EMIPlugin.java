@@ -65,7 +65,7 @@ public class EMIPlugin implements EmiPlugin, IPlugin {
         public EmiStackInteraction getStackAt(T screen, int x, int y) {
             var clicked = ext.getEffectAtPosition(screen, x, y, IEffectScreenExtension.CallReason.RECIPE_KEY);
             if (clicked != null) {
-                return new EmiStackInteraction(new EffectInstanceStack(clicked));
+                return new EmiStackInteraction(new EffectInstanceStack(clicked), null, false);
             }
             return EmiStackInteraction.EMPTY;
         }
