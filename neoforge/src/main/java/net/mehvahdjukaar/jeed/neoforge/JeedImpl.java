@@ -33,6 +33,7 @@ public class JeedImpl {
         }
 
         Jeed.EMI = ModList.get().isLoaded("emi");
+        Jeed.REI = ModList.get().isLoaded("roughlyenoughitems");
 
         RECIPES_SERIALIZERS.register(bus);
         RECIPE_TYPES.register(bus);

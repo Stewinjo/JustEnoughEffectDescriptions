@@ -24,7 +24,6 @@ import net.mehvahdjukaar.jeed.plugin.jei.ingredient.EffectInstanceHelper;
 import net.mehvahdjukaar.jeed.plugin.jei.ingredient.EffectInstanceRenderer;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.Items;
 
@@ -58,14 +57,14 @@ public class JEIPlugin implements IModPlugin, IPlugin {
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registry) {
-        if (Jeed.EMI) return;
+        if (Jeed.EMI || Jeed.REI) return;
 
         registry.addRecipeCategories(new EffectInfoRecipeCategory(registry.getJeiHelpers().getGuiHelper()));
     }
 
     @Override
     public void registerIngredients(IModIngredientRegistration registration) {
-        if (Jeed.EMI) return;
+        if (Jeed.EMI || Jeed.REI) return;
 
         registration.register(EFFECT_INGREDIENT_TYPE,
                 Jeed.getEffectList().stream().map(MobEffectInstance::new).toList(),
@@ -79,7 +78,7 @@ public class JEIPlugin implements IModPlugin, IPlugin {
 
     @Override
     public void registerRecipes(IRecipeRegistration registry) {
-        if (Jeed.EMI) return;
+        if (Jeed.EMI || Jeed.REI) return;
 
         JEI_INGREDIENT_VISIBILITY = registry.getIngredientVisibility();
         JEI_HELPERS = registry.getJeiHelpers();
@@ -92,7 +91,7 @@ public class JEIPlugin implements IModPlugin, IPlugin {
 
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-        if (Jeed.EMI) return;
+        if (Jeed.EMI || Jeed.REI) return;
 
         for (var e : ScreenExtensionsHandler.EXTENSIONS.entrySet()) {
             var screenClass = (Class<AbstractContainerScreen<?>>) e.getKey();
@@ -121,14 +120,14 @@ public class JEIPlugin implements IModPlugin, IPlugin {
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        if (Jeed.EMI) return;
+        if (Jeed.EMI || Jeed.REI) return;
 
         registration.addRecipeCatalyst(Items.POTION.getDefaultInstance(), EffectInfoRecipe.TYPE);
     }
 
     @Override
     public void onClickedEffect(MobEffectInstance effect, double x, double y, int button) {
-        if (Jeed.EMI) return;
+        if (Jeed.EMI || Jeed.REI) return;
 
         var focus = JEIPlugin.JEI_HELPERS.getFocusFactory().createFocus(RecipeIngredientRole.INPUT, JEIPlugin.EFFECT_INGREDIENT_TYPE, effect);
 

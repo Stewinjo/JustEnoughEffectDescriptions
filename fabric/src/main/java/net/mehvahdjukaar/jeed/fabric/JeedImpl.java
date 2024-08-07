@@ -44,6 +44,7 @@ public class JeedImpl implements ModInitializer {
             Jeed.LOGGER.error("Jeed requires either JEI, REI or EMI mods. None of them was found");
         }
         Jeed.EMI = FabricLoader.getInstance().isModLoaded("emi");
+        Jeed.REI = FabricLoader.getInstance().isModLoaded("roughlyenoughitems");
 
         if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
             JeedClient.init();
