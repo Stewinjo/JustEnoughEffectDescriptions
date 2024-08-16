@@ -33,7 +33,7 @@ import java.util.List;
 
 import static net.mehvahdjukaar.jeed.common.Constants.*;
 
-public class EffectInfoRecipe extends EffectInfo implements EmiRecipe {
+public class EmiEffectInfoRecipe extends EffectInfo implements EmiRecipe {
 
     private final ResourceLocation id;
     private final List<EmiIngredient> catalysts;
@@ -41,7 +41,7 @@ public class EffectInfoRecipe extends EffectInfo implements EmiRecipe {
     private final List<EmiIngredient> inputEffects;
     private final EmiStack outputs;
 
-    protected EffectInfoRecipe(MobEffectInstance effectInstance, Component description, ResourceLocation id) {
+    protected EmiEffectInfoRecipe(MobEffectInstance effectInstance, Component description, ResourceLocation id) {
         super(effectInstance, List.of(description));
         this.id = id;
         this.outputs = new EffectInstanceStack(effectInstance);
@@ -168,10 +168,10 @@ public class EffectInfoRecipe extends EffectInfo implements EmiRecipe {
 
     }
 
-    public static EffectInfoRecipe create(Holder<MobEffect> effect) {
+    public static EmiEffectInfoRecipe create(Holder<MobEffect> effect) {
         Component text = getDescription(effect);
 
-        return new EffectInfoRecipe(new MobEffectInstance(effect), text, effect.unwrapKey().get().location());
+        return new EmiEffectInfoRecipe(new MobEffectInstance(effect), text, effect.unwrapKey().get().location());
     }
 
     private static class PageManager {

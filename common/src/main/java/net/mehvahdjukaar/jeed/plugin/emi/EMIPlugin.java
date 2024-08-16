@@ -7,7 +7,7 @@ import net.mehvahdjukaar.jeed.Jeed;
 import net.mehvahdjukaar.jeed.api.IEffectScreenExtension;
 import net.mehvahdjukaar.jeed.common.IPlugin;
 import net.mehvahdjukaar.jeed.common.ScreenExtensionsHandler;
-import net.mehvahdjukaar.jeed.plugin.emi.display.EffectInfoRecipe;
+import net.mehvahdjukaar.jeed.plugin.emi.display.EmiEffectInfoRecipe;
 import net.mehvahdjukaar.jeed.plugin.emi.display.EffectInfoRecipeCategory;
 import net.mehvahdjukaar.jeed.plugin.emi.ingredient.EffectIngredientSerializer;
 import net.mehvahdjukaar.jeed.plugin.emi.ingredient.EffectInstanceStack;
@@ -17,6 +17,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.item.CreativeModeTab;
 
 @EmiEntrypoint
 public class EMIPlugin implements EmiPlugin, IPlugin {
@@ -34,7 +35,7 @@ public class EMIPlugin implements EmiPlugin, IPlugin {
         Jeed.getEffectList().stream().map(MobEffectInstance::new)
                 .map(EffectInstanceStack::new).forEach(registry::addEmiStack);
         for (Holder<MobEffect> e : Jeed.getEffectList()) {
-            registry.addRecipe(EffectInfoRecipe.create(e));
+            registry.addRecipe(EmiEffectInfoRecipe.create(e));
         }
 
         for (var e : ScreenExtensionsHandler.EXTENSIONS.entrySet()) {
@@ -43,6 +44,7 @@ public class EMIPlugin implements EmiPlugin, IPlugin {
 
             registry.addStackProvider(screenClass, new ScreenExtension<>(effect));
         }
+        //purposefully not adding a workstation? i think
     }
 
     @Override

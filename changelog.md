@@ -1,1 +1,1 @@
-fixed an issue with neoforge
+effect provider and potion provider recipes now support Components

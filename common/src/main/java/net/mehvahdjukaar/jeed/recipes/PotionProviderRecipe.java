@@ -5,6 +5,7 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.mehvahdjukaar.jeed.Jeed;
+import net.mehvahdjukaar.jeed.common.CodecUtil;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
@@ -77,7 +78,7 @@ public record PotionProviderRecipe(List<Holder<Potion>> potions,
 
         private static final MapCodec<PotionProviderRecipe> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
                 BuiltInRegistries.POTION.holderByNameCodec().listOf().optionalFieldOf("potions", List.of()).forGetter((r) -> r.potions),
-                Ingredient.CODEC_NONEMPTY.listOf().fieldOf("providers").flatXmap((list) -> {
+                CodecUtil.INGREDIENT_WITH_TAG.listOf().fieldOf("providers").flatXmap((list) -> {
                     Ingredient[] ingredients = list.stream().filter((ingredient) -> !ingredient.isEmpty()).toArray(Ingredient[]::new);
                     if (ingredients.length == 0) {
                         return DataResult.error(() -> "No providers for potion providers recipe");

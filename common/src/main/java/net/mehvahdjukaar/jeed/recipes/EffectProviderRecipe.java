@@ -1,13 +1,16 @@
 package net.mehvahdjukaar.jeed.recipes;
 
 
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.mehvahdjukaar.jeed.Jeed;
+import net.mehvahdjukaar.jeed.common.CodecUtil;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -16,6 +19,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.Level;
 
 import java.util.Collection;
@@ -80,9 +84,11 @@ public record EffectProviderRecipe(Optional<Holder<MobEffect>> effect,
 
     public static class Serializer implements RecipeSerializer<EffectProviderRecipe> {
 
+
+
         private static final MapCodec<EffectProviderRecipe> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
                 BuiltInRegistries.MOB_EFFECT.holderByNameCodec().optionalFieldOf("effect").forGetter((shapelessRecipe) -> shapelessRecipe.effect),
-                Ingredient.CODEC_NONEMPTY.listOf().optionalFieldOf("providers", List.of()).flatXmap((list) -> {
+                CodecUtil.INGREDIENT_WITH_TAG.listOf().optionalFieldOf("providers", List.of()).flatXmap((list) -> {
                     Ingredient[] ingredients = list.stream().filter((ingredient) -> !ingredient.isEmpty()).toArray(Ingredient[]::new);
                     return DataResult.success(NonNullList.of(Ingredient.EMPTY, ingredients));
                 }, DataResult::success).forGetter((shapelessRecipe) -> shapelessRecipe.providers),
